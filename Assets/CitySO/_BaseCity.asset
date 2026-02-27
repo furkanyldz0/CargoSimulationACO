@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f586d2373bb9f634693684d4b93b018d, type: 3}
+  m_Name: _BaseCity
+  m_EditorClassIdentifier: Assembly-CSharp::CitySO
+  city: 0
+  neighbors:
+  - neighborCitySO: {fileID: 11400000, guid: d615b194d96ecbb4b9e030907223e01e, type: 2}
+    distance: 100
+  - neighborCitySO: {fileID: 11400000, guid: be26ef9848876d14b9ee0cd3713f6207, type: 2}
+    distance: 100
+  - neighborCitySO: {fileID: 11400000, guid: de08cfe49f92dd1439388372ae37a6fa, type: 2}
+    distance: 100
