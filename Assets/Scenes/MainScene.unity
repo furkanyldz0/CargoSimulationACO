@@ -1497,8 +1497,9 @@ GameObject:
   - component: {fileID: 827248724}
   - component: {fileID: 827248723}
   - component: {fileID: 827248722}
+  - component: {fileID: 827248726}
   m_Layer: 0
-  m_Name: Road
+  m_Name: Road (Base - A)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1597,6 +1598,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1049005485}
   m_LocalEulerAnglesHint: {x: 0, y: -20.936, z: 0}
+--- !u!114 &827248726
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 827248721}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 064365a8cc072d549880d8d03795f042, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Road
+  startCity: {fileID: 11400000, guid: 4ddc40bbdbedccb4fbb8be1c8ec62ffd, type: 2}
+  endCity: {fileID: 11400000, guid: d615b194d96ecbb4b9e030907223e01e, type: 2}
+  waypointParent: {fileID: 1586471720}
 --- !u!1 &827807639
 GameObject:
   m_ObjectHideFlags: 0
@@ -2264,8 +2280,9 @@ GameObject:
   - component: {fileID: 983071061}
   - component: {fileID: 983071060}
   - component: {fileID: 983071059}
+  - component: {fileID: 983071063}
   m_Layer: 0
-  m_Name: Road (2)
+  m_Name: Road (Base - B)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2364,6 +2381,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1049005485}
   m_LocalEulerAnglesHint: {x: 0, y: 19.893, z: 0}
+--- !u!114 &983071063
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 983071058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 064365a8cc072d549880d8d03795f042, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Road
+  startCity: {fileID: 11400000, guid: 4ddc40bbdbedccb4fbb8be1c8ec62ffd, type: 2}
+  endCity: {fileID: 11400000, guid: be26ef9848876d14b9ee0cd3713f6207, type: 2}
+  waypointParent: {fileID: 858024421}
 --- !u!1 &997000688
 GameObject:
   m_ObjectHideFlags: 0
@@ -2513,8 +2545,9 @@ GameObject:
   - component: {fileID: 1025316047}
   - component: {fileID: 1025316046}
   - component: {fileID: 1025316045}
+  - component: {fileID: 1025316049}
   m_Layer: 0
-  m_Name: Road (5)
+  m_Name: Road (C - D)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2613,6 +2646,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1049005485}
   m_LocalEulerAnglesHint: {x: 0, y: -7.488, z: 0}
+--- !u!114 &1025316049
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1025316044}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 064365a8cc072d549880d8d03795f042, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Road
+  startCity: {fileID: 11400000, guid: de08cfe49f92dd1439388372ae37a6fa, type: 2}
+  endCity: {fileID: 11400000, guid: b0ae9ec846348ff4396855d18d3d0906, type: 2}
+  waypointParent: {fileID: 0}
 --- !u!1 &1025861602
 GameObject:
   m_ObjectHideFlags: 0
@@ -2643,6 +2691,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f44538f2f8ae84a45818b966616f7f45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Test
+  moveSpeed: 20
+  currentWaypointParent: {fileID: 1586471720}
+  currentCity: {fileID: 11400000, guid: 4ddc40bbdbedccb4fbb8be1c8ec62ffd, type: 2}
+  targetCity: {fileID: 11400000, guid: d615b194d96ecbb4b9e030907223e01e, type: 2}
+  city1: {fileID: 11400000, guid: b0ae9ec846348ff4396855d18d3d0906, type: 2}
 --- !u!65 &1025861604
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2945,6 +2998,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2003961472}
+  - {fileID: 1394474439}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1259754210
@@ -3100,8 +3154,9 @@ GameObject:
   - component: {fileID: 1392975494}
   - component: {fileID: 1392975493}
   - component: {fileID: 1392975492}
+  - component: {fileID: 1392975496}
   m_Layer: 0
-  m_Name: Road (3)
+  m_Name: Road (Base - C)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3200,6 +3255,72 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1049005485}
   m_LocalEulerAnglesHint: {x: 0, y: 46.855, z: 0}
+--- !u!114 &1392975496
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1392975491}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 064365a8cc072d549880d8d03795f042, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Road
+  startCity: {fileID: 11400000, guid: 4ddc40bbdbedccb4fbb8be1c8ec62ffd, type: 2}
+  endCity: {fileID: 11400000, guid: de08cfe49f92dd1439388372ae37a6fa, type: 2}
+  waypointParent: {fileID: 1745547299}
+--- !u!1 &1394474438
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1394474439}
+  - component: {fileID: 1394474440}
+  m_Layer: 0
+  m_Name: GraphManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1394474439
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1394474438}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1235878922}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1394474440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1394474438}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49bbea1ae58da944fa489b536b36aa55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GraphManager
+  allEdges:
+  - {fileID: 827248726}
+  - {fileID: 1404465607}
+  - {fileID: 983071063}
+  - {fileID: 2077270550}
+  - {fileID: 1025316049}
+  - {fileID: 1392975496}
 --- !u!1 &1404465602
 GameObject:
   m_ObjectHideFlags: 0
@@ -3212,8 +3333,9 @@ GameObject:
   - component: {fileID: 1404465605}
   - component: {fileID: 1404465604}
   - component: {fileID: 1404465603}
+  - component: {fileID: 1404465607}
   m_Layer: 0
-  m_Name: Road (1)
+  m_Name: Road (A - D)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3312,6 +3434,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1049005485}
   m_LocalEulerAnglesHint: {x: 0, y: 58.057, z: 0}
+--- !u!114 &1404465607
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1404465602}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 064365a8cc072d549880d8d03795f042, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Road
+  startCity: {fileID: 11400000, guid: d615b194d96ecbb4b9e030907223e01e, type: 2}
+  endCity: {fileID: 11400000, guid: b0ae9ec846348ff4396855d18d3d0906, type: 2}
+  waypointParent: {fileID: 1627900465}
 --- !u!1 &1407571728
 GameObject:
   m_ObjectHideFlags: 0
@@ -4511,6 +4648,10 @@ MonoBehaviour:
   - {fileID: 1627900465}
   moveSpeed: 30
   vehicle: {fileID: 1025861603}
+  currentWaypointParent: {fileID: 0}
+  waypoints: []
+  currentWaypointIndex: 0
+  currentWaypointParentIndex: 0
 --- !u!1 &2077270545
 GameObject:
   m_ObjectHideFlags: 0
@@ -4523,8 +4664,9 @@ GameObject:
   - component: {fileID: 2077270548}
   - component: {fileID: 2077270547}
   - component: {fileID: 2077270546}
+  - component: {fileID: 2077270550}
   m_Layer: 0
-  m_Name: Road (4)
+  m_Name: Road (B - D)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4623,6 +4765,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1049005485}
   m_LocalEulerAnglesHint: {x: 0, y: 37.512, z: 0}
+--- !u!114 &2077270550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2077270545}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 064365a8cc072d549880d8d03795f042, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Road
+  startCity: {fileID: 11400000, guid: be26ef9848876d14b9ee0cd3713f6207, type: 2}
+  endCity: {fileID: 11400000, guid: b0ae9ec846348ff4396855d18d3d0906, type: 2}
+  waypointParent: {fileID: 0}
 --- !u!1 &2130823034
 GameObject:
   m_ObjectHideFlags: 0

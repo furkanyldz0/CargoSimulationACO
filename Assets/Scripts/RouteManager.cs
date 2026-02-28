@@ -1,64 +1,79 @@
-using System.Collections.Generic;
-using UnityEngine;
+//using System.Collections.Generic;
+//using UnityEngine;
 
-public class RouteManager : MonoBehaviour
-{
-    [SerializeField] private Transform[] waypointParents;
-    [SerializeField] private float moveSpeed = 10f;
-    [SerializeField] private Vehicle vehicle;
+//public class RouteManager : MonoBehaviour
+//{
+//    [SerializeField] private Transform[] waypointParents;
+//    [SerializeField] private float moveSpeed = 10f;
+//    [SerializeField] private Vehicle vehicle;
     
-    private Transform currentWaypointParent;
-    private List<Transform> waypoints = new List<Transform>();
-    private int currentIndex = 0;
-    private int currentWaypointParentIndex = 0;
+//    private Transform currentWaypointParent;
+//    private List<Transform> waypoints = new List<Transform>();
+//    private int currentWaypointIndex = 0;
+//    private int currentWaypointParentIndex;
 
-    private void Start() {
-        currentWaypointParent = waypointParents[currentWaypointParentIndex];
-        UpdateWaypoints(currentWaypointParent);
+//    private void Start() {
+//        currentWaypointParentIndex = 0;
+//        currentWaypointParent = waypointParents[currentWaypointParentIndex];
+//        UpdateCourse(currentWaypointParent);
         
-        vehicle.transform.position = waypoints[currentIndex].position;
-        Debug.Log("index: " + currentIndex);
-    }
+//        vehicle.transform.position = waypoints[currentWaypointIndex].position;
+//        Debug.Log(currentWaypointParent + ", index: " + currentWaypointIndex);
+//    }
 
     
-    private void Update() {  //rota tamamlanýnca if koþulunun içine girmeyi býrakýyor, currentindex sýfýrlanmýyor çünkü
-        if (currentIndex < waypoints.Count - 1) { //-1 koymazsak currentindex+1 eriþirken sýkýntý çýkýyor
-            vehicle.transform.position = Vector3.MoveTowards(vehicle.transform.position, waypoints[currentIndex + 1].position,
-                Time.deltaTime * moveSpeed);
+//    private void Update() {  //rota tamamlanýnca if koþulunun içine girmeyi býrakýyor, currentindex sýfýrlanmýyor çünkü
+//        if (currentWaypointIndex < waypoints.Count - 1) { //-1 koymazsak currentindex+1 eriþirken sýkýntý çýkýyor
+//            vehicle.transform.position = Vector3.MoveTowards(vehicle.transform.position, waypoints[currentWaypointIndex + 1].position,
+//                Time.deltaTime * moveSpeed);
 
-            if (vehicle.transform.position == waypoints[currentIndex + 1].position) {
-                currentIndex++;
-                Debug.Log("index: " + currentIndex);
-                if (currentIndex == waypoints.Count - 1) {
-                    Debug.Log("rota tamamlandý");
-                    if(currentWaypointParentIndex >= waypointParents.Length - 1) {
-                        Debug.Log("tüm rotalar gezildi!, son currentwaypointParentIndex: " + currentWaypointParentIndex);
-                    }
-                    else{
-                        Debug.Log(currentWaypointParent + "rota güncelleniyor...");
-                        currentWaypointParentIndex++;
-                        UpdateCourse(currentWaypointParentIndex);
-                    }
-                }
-            }
-        }
-    }
+//            if (vehicle.transform.position == waypoints[currentWaypointIndex + 1].position) {
+//                currentWaypointIndex++;
+//                Debug.Log(currentWaypointParent + ", index: " + currentWaypointIndex);
 
-    private void UpdateWaypoints(Transform waypointParent) {
-        waypoints.Clear();
-        foreach(Transform child in waypointParent) {
-            waypoints.Add(child);
-        }
-        //for (int i = 0; i < waypointParent.childCount; i++) {
-        //    waypoints.Add(waypointParent.GetChild(i));
-        //}
-    }
+//                if (currentWaypointIndex == waypoints.Count - 1) {
+//                    //mevcut waypointparentin tüm waypointleri ziyaret edildi
+//                    Debug.Log(currentWaypointParent + " rota tamamlandý");
 
-    private void UpdateCourse(int waypointParentIndex) {
-        currentIndex = 0;
-        currentWaypointParent = waypointParents[waypointParentIndex];
-        UpdateWaypoints(currentWaypointParent);
+//                    if(currentWaypointParentIndex >= waypointParents.Length - 1) {
+//                        //verilen tüm waypointler ziyaret edildi
+//                        Debug.Log("tüm rotalar ziyaret edildi!, son currentwaypointParentIndex: " + currentWaypointParentIndex);
+//                    }
+//                    else{
+//                        //waypoint güncellemek adýna waypointparent update ediliyor
+//                        currentWaypointParentIndex++;
+//                        currentWaypointParent = waypointParents[currentWaypointParentIndex];
+//                        UpdateCourse(currentWaypointParent);
+//                    }
+//                }
+//            }
+//        }
+//    }
 
-        Debug.Log("Rota güncellendi");
-    }
-}
+//    private void UpdateCourse(Transform waypointParent) {
+//        currentWaypointIndex = 0;
+//        waypoints.Clear(); //gerek yok silinebilir
+//        waypoints = GetChildrenFromParent(currentWaypointParent);
+
+//        Debug.Log("yeni rota: " + currentWaypointParent);
+//    }
+    
+//    private List<Transform> GetChildrenFromParent(Transform parent) {
+//        List<Transform> childrenList = new List<Transform>();
+//        foreach (Transform child in parent) {
+//            childrenList.Add(child);
+//        }
+
+//        return childrenList;
+//    }
+
+//    //private void GetWaypointsFromParent(Transform waypointParent) {
+//    //    waypoints.Clear();
+//    //    foreach (Transform child in waypointParent) {
+//    //        waypoints.Add(child);
+//    //    }
+//    //    //for (int i = 0; i < waypointParent.childCount; i++) {
+//    //    //    waypoints.Add(waypointParent.GetChild(i));
+//    //    //}
+//    //}
+//}
