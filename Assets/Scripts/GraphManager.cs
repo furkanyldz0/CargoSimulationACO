@@ -5,7 +5,7 @@ public class GraphManager : MonoBehaviour
 {
     public static GraphManager Instance { get; private set; }
 
-    public List<Road> allEdges; // Tüm yollarý buraya sürükleyip býrakacaksýn
+    [SerializeField] private List<Road> allEdges; // Tüm yollarý buraya sürükleyip býrakacaksýn
 
     private void Start() {
         if(Instance != null) {

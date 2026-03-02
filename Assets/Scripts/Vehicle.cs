@@ -6,13 +6,12 @@ public class Vehicle : MonoBehaviour
     private State state;
 
     [SerializeField] private float moveSpeed = 10f;
-    [SerializeField] private Transform currentWaypointParent;
+    private Transform currentWaypointParent;
     private List<Transform> waypoints = new List<Transform>();
     private int currentWaypointIndex = 0;
 
     [SerializeField] private CitySO currentCity;
-    [SerializeField] private CitySO targetCity;
-    [SerializeField] private CitySO city1;
+    private CitySO targetCity;
 
     public enum State {
         idle,
@@ -20,9 +19,11 @@ public class Vehicle : MonoBehaviour
     }
 
     private void Start() {
+        
         state = State.traveling;
-        UpdateCourse(currentWaypointParent);
-        transform.position = waypoints[currentWaypointIndex].position;
+        //UpdateCourse(currentWaypointParent);
+        //transform.position = waypoints[currentWaypointIndex].position;
+        TravelNextCity();
         Debug.Log(currentWaypointParent + ", index: " + currentWaypointIndex);
     }
 
@@ -45,9 +46,7 @@ public class Vehicle : MonoBehaviour
                             //mevcut waypointparentin tüm waypointleri ziyaret edildi
                             Debug.Log(currentWaypointParent + " rota tamamlandý");
                             currentCity = targetCity;
-                            targetCity = city1; //Deneme amaçlý
-                            DecideNextMove();
-                            //state = State.idle;
+                            TravelNextCity();
                         }
                     }
                 }
@@ -56,23 +55,14 @@ public class Vehicle : MonoBehaviour
         }
     }
 
-    public void DecideNextMove() {
+    public void TravelNextCity() {
         // ACO algoritmasý çalýþýr ve bize bir "CitySO" döner
         //targetCity = ACO_Logic.PickNextCity(currentCity);
-
-        // Ýþte burada GraphManager'a o iki "objeyi" veririz
+        targetCity = RoadSelection.Instance.PickRoad(currentCity);
+        
         currentWaypointParent = GraphManager.Instance.GetWaypointParentBetween(currentCity, targetCity);
         waypoints = GetChildrenFromParent(currentWaypointParent);
         currentWaypointIndex = 0;
-        // Yolu takip etmeye baþla...
-    }
-
-    private void UpdateCourse(Transform waypointParent) {
-        currentWaypointIndex = 0;
-        waypoints.Clear(); //gerek yok silinebilir
-        waypoints = GetChildrenFromParent(currentWaypointParent);
-
-        Debug.Log("yeni rota: " + currentWaypointParent);
     }
 
     private List<Transform> GetChildrenFromParent(Transform parent) {
@@ -83,4 +73,14 @@ public class Vehicle : MonoBehaviour
 
         return childrenList;
     }
+
+    //private void UpdateCourse(Transform waypointParent) {
+    //    currentWaypointIndex = 0;
+    //    waypoints.Clear(); //gerek yok silinebilir
+    //    waypoints = GetChildrenFromParent(currentWaypointParent);
+
+    //    Debug.Log("yeni rota: " + currentWaypointParent);
+    //}
+
+
 }

@@ -18,3 +18,5 @@ MonoBehaviour:
     distance: 100
   - neighborCitySO: {fileID: 11400000, guid: b0ae9ec846348ff4396855d18d3d0906, type: 2}
     distance: 100
+  - neighborCitySO: {fileID: 11400000, guid: be26ef9848876d14b9ee0cd3713f6207, type: 2}
+    distance: 100
