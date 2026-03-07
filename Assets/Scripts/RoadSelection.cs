@@ -6,8 +6,8 @@ public class RoadSelection : MonoBehaviour
 
     private int estimateCount = 10;
 
-    private void Start() {
-        if(Instance != null) {
+    private void Awake() {
+        if (Instance != null) {
             Debug.LogError("Sahnede birden fazla RoadSelection var! " + this);
         }
         Instance = this;

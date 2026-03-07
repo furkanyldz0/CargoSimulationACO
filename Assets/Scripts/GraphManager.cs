@@ -7,7 +7,9 @@ public class GraphManager : MonoBehaviour
 
     [SerializeField] private List<Road> allEdges; // Tüm yollarý buraya sürükleyip býrakacaksýn
 
-    private void Start() {
+    public CitySO targetCity;
+
+    private void Awake() {
         if(Instance != null) {
             Debug.LogError("sahnede birden fazla GraphManager var!");
         }

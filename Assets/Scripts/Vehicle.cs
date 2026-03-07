@@ -5,13 +5,16 @@ public class Vehicle : MonoBehaviour
 {
     private State state;
 
-    [SerializeField] private float moveSpeed = 10f;
+    [SerializeField] private float moveSpeed = 20f;
+    private Vector3 targetRotation;
+    private float rotateSpeed = 20f;
+
     private Transform currentWaypointParent;
     private List<Transform> waypoints = new List<Transform>();
-    private int currentWaypointIndex = 0;
+    private int currentWaypointIndex = -1;
 
     [SerializeField] private CitySO currentCity;
-    private CitySO targetCity;
+    private CitySO nextCity;
 
     public enum State {
         idle,
@@ -19,12 +22,8 @@ public class Vehicle : MonoBehaviour
     }
 
     private void Start() {
-        
         state = State.traveling;
-        //UpdateCourse(currentWaypointParent);
-        //transform.position = waypoints[currentWaypointIndex].position;
         TravelNextCity();
-        Debug.Log(currentWaypointParent + ", index: " + currentWaypointIndex);
     }
 
     private void Update() {
@@ -38,6 +37,9 @@ public class Vehicle : MonoBehaviour
                     transform.position = Vector3.MoveTowards(transform.position, waypoints[currentWaypointIndex + 1].position,
                         Time.deltaTime * moveSpeed);
 
+                    targetRotation = waypoints[currentWaypointIndex + 1].position - transform.position;
+                    transform.forward = Vector3.Slerp(transform.forward, targetRotation, Time.deltaTime * rotateSpeed);
+
                     if (transform.position == waypoints[currentWaypointIndex + 1].position) {
                         currentWaypointIndex++;
                         Debug.Log(currentWaypointParent + ", index: " + currentWaypointIndex);
@@ -45,42 +47,46 @@ public class Vehicle : MonoBehaviour
                         if (currentWaypointIndex == waypoints.Count - 1) {
                             //mevcut waypointparentin tüm waypointleri ziyaret edildi
                             Debug.Log(currentWaypointParent + " rota tamamlandý");
-                            currentCity = targetCity;
-                            TravelNextCity();
-                        }
+                            currentCity = nextCity;
+                            if(currentCity == GraphManager.Instance.targetCity) {
+                                Debug.Log("Hedef þehre varýldý!");
+                                state = State.idle; //bundan sonra djikstra ile eve gidecek
+                            }
+                            else {
+                                TravelNextCity();
+                            }                       
+                        }  
                     }
                 }
                 break;
-
         }
     }
 
-    public void TravelNextCity() {
+    private void TravelNextCity() {
         // ACO algoritmasý çalýþýr ve bize bir "CitySO" döner
         //targetCity = ACO_Logic.PickNextCity(currentCity);
-        targetCity = RoadSelection.Instance.PickRoad(currentCity);
-        
-        currentWaypointParent = GraphManager.Instance.GetWaypointParentBetween(currentCity, targetCity);
-        waypoints = GetChildrenFromParent(currentWaypointParent);
-        currentWaypointIndex = 0;
+        nextCity = RoadSelection.Instance.PickRoad(currentCity);
+
+        currentWaypointParent = GraphManager.Instance.GetWaypointParentBetween(currentCity, nextCity);
+        //waypoints = GetChildrenFromParent(currentWaypointParent);
+        UpdateWaypoints(currentWaypointParent);
+        currentWaypointIndex = -1;
     }
 
-    private List<Transform> GetChildrenFromParent(Transform parent) {
-        List<Transform> childrenList = new List<Transform>();
-        foreach (Transform child in parent) {
-            childrenList.Add(child);
+    private void UpdateWaypoints(Transform waypointParent) {
+        waypoints.Clear();
+        foreach (Transform child in waypointParent) {
+            waypoints.Add(child);
         }
-
-        return childrenList;
     }
 
-    //private void UpdateCourse(Transform waypointParent) {
-    //    currentWaypointIndex = 0;
-    //    waypoints.Clear(); //gerek yok silinebilir
-    //    waypoints = GetChildrenFromParent(currentWaypointParent);
+        //private List<Transform> GetChildrenFromParent(Transform parent) {
+        //    List<Transform> childrenList = new List<Transform>();
+        //    foreach (Transform child in parent) {
+        //        childrenList.Add(child);
+        //    }
 
-    //    Debug.Log("yeni rota: " + currentWaypointParent);
-    //}
+        //    return childrenList;
+        //}
 
-
-}
+    }
