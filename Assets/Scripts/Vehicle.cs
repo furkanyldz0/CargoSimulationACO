@@ -72,7 +72,7 @@ public class Vehicle : MonoBehaviour
         // BURASI KRÝTÝK: Listeyi metoda parametre olarak gönderiyoruz
         nextCity = ACOSelection.ChooseNextCity(currentCity, traveledRoads);
 
-        if (nextCity != null) {
+        if (nextCity != null) { //burada kullaným adedini eklemek için güncelleme yapabilirim (road scripti için)
             Road road = GraphManager.Instance.GetRoadBetween(currentCity, nextCity);
 
             // Bu yeni yolu hafýzaya ekle ki bir sonraki seçimde buraya geri dönmesin

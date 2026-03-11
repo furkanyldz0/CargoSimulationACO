@@ -11,8 +11,8 @@ public static class ACOSelection {
         List<CitySO> visitedCities = new List<CitySO>();
         foreach (Road road in traveledRoads) {
             // Yolun hem baþlangýç hem bitiþini ekleyerek tam garantiye alýyoruz
-            if (!visitedCities.Contains(road.startCity)) visitedCities.Add(road.startCity);
-            if (!visitedCities.Contains(road.endCity)) visitedCities.Add(road.endCity);
+            if (!visitedCities.Contains(road.startCitySO)) visitedCities.Add(road.startCitySO);
+            if (!visitedCities.Contains(road.endCitySO)) visitedCities.Add(road.endCitySO);
         }
 
         // 2. Sadece daha önce gidilmemiþ komþularý filtrele

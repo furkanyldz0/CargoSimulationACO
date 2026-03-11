@@ -42,7 +42,7 @@ public class GraphManager : MonoBehaviour
 
     public Road GetRoadBetween(CitySO startCity, CitySO endCity) {
         foreach (Road road in allEdges) {
-            if (road.startCity == startCity && road.endCity == endCity) {
+            if (road.startCitySO == startCity && road.endCitySO == endCity) {
                 return road;
             }
         }

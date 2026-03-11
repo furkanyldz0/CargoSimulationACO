@@ -158,7 +158,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f44538f2f8ae84a45818b966616f7f45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Test
-  moveSpeed: 20
+  moveSpeed: 40
   currentCity: {fileID: 11400000, guid: 4ddc40bbdbedccb4fbb8be1c8ec62ffd, type: 2}
 --- !u!1 &6869655880024949433
 GameObject:
