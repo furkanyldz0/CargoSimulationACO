@@ -6,6 +6,7 @@ using UnityEngine;
 
 [SelectionBase]
 public class Road : MonoBehaviour {
+
     public CitySO startCitySO;
     public CitySO endCitySO;
     public Transform waypointParent;
@@ -15,6 +16,7 @@ public class Road : MonoBehaviour {
 
     public float distance;
     public float pheromoneLevel = 1f;
+    public int useCount = 0;
 
     [SerializeField] private TextMeshProUGUI distanceText;
     [SerializeField] private TextMeshProUGUI pheromoneText;
@@ -22,13 +24,6 @@ public class Road : MonoBehaviour {
 
     private int textUpdateCountPerSecond = 10;
     private float textUpdateTime, textUpdateTimeDelta;
-
-    //editörde herhangi bir deðiþiklik yapýldýðýnda çalýþýr, þimdilik iptal çünkü null exception fýrlatýyor
-    //private void OnValidate() {
-    //    if (waypointParent != null && waypointParent.childCount >= 2) {
-    //        SnapWaypoints();
-    //    }
-    //}
 
     private void Start() {
         startCity = CityPool.Instance.GetCityForCitySO(startCitySO);
@@ -44,19 +39,22 @@ public class Road : MonoBehaviour {
         textUpdateTimeDelta -= Time.deltaTime;
         if(textUpdateTimeDelta <= 0f) {
             pheromoneText.SetText("f: " + pheromoneLevel.ToString("F4"));
-            useCountText.SetText("u: ");
+            useCountText.SetText("u: " + useCount);
+
             textUpdateTimeDelta = textUpdateTime;
         }
     }
 
     public void SnapWaypoints() {
-        waypointParent.GetChild(0).position = startCity.transform.position;
+        waypointParent.GetChild(0).position =
+            CityPool.Instance.GetCityForCitySO(startCitySO).transform.position;
   
         int lastIndex = waypointParent.childCount - 1;
-        waypointParent.GetChild(lastIndex).position = endCity.transform.position;
+
+        waypointParent.GetChild(lastIndex).position =
+            CityPool.Instance.GetCityForCitySO(endCitySO).transform.position;
         
     }
-
     
     public void CalculateDistance() {
         SnapWaypoints(); // Önce uçlarý sabitle, sonra ölç

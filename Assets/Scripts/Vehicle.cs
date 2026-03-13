@@ -5,16 +5,16 @@ public class Vehicle : MonoBehaviour
 {
     private State state;
 
-    [SerializeField] private float moveSpeed = 20f;
-    private Vector3 targetRotation;
+    [SerializeField] private float moveSpeed = 20f; //hareket hýzýný ileride vehiclespawner'dan ayarlayabiliriz
     private float rotateSpeed = 20f;
+    private Vector3 targetRotation;
 
-    private Transform currentWaypointParent;
     private List<Transform> waypoints = new List<Transform>();
     private int currentWaypointIndex = -1;
 
     // Sýnýfýn üst kýsmýna ekle
-    private List<Road> traveledRoads = new List<Road>();
+    private List<Road> traveledRoads = new List<Road>(); //feromon eklenmesi için
+    private List<CitySO> visitedCities = new List<CitySO>(); //önceki þehirlere tekrar gitmemesi için
 
     [SerializeField] private CitySO currentCity;
     private CitySO nextCity;
@@ -26,6 +26,8 @@ public class Vehicle : MonoBehaviour
 
     private void Start() {
         state = State.traveling;
+
+        if (!visitedCities.Contains(currentCity)) visitedCities.Add(currentCity);
         TravelNextCity();
     }
 
@@ -36,7 +38,7 @@ public class Vehicle : MonoBehaviour
                 break;
 
             case State.traveling:
-                if (currentWaypointIndex < waypoints.Count - 1) { //-1 koymazsak currentindex+1 eriþirken sýkýntý çýkýyor
+                if (currentWaypointIndex < waypoints.Count - 1) {
                     transform.position = Vector3.MoveTowards(transform.position, waypoints[currentWaypointIndex + 1].position,
                         Time.deltaTime * moveSpeed);
 
@@ -45,14 +47,12 @@ public class Vehicle : MonoBehaviour
 
                     if (transform.position == waypoints[currentWaypointIndex + 1].position) {
                         currentWaypointIndex++;
-                        //Debug.Log(currentWaypointParent + ", index: " + currentWaypointIndex);
 
                         if (currentWaypointIndex == waypoints.Count - 1) {
                             //mevcut waypointparentin tüm waypointleri ziyaret edildi
-                            //Debug.Log(currentWaypointParent + " rota tamamlandý");
                             currentCity = nextCity;
                             if(currentCity == GraphManager.Instance.targetCity) {
-                                //Debug.Log("Hedef þehre varýldý!");
+                                //hedef þehre varýldý
                                 DepositPheromones();
                                 state = State.idle; //bundan sonra djikstra ile eve gidecek, ama þimdilik destroy edelim
                                 Destroy(gameObject);
@@ -70,18 +70,17 @@ public class Vehicle : MonoBehaviour
 
     private void TravelNextCity() {
         // BURASI KRÝTÝK: Listeyi metoda parametre olarak gönderiyoruz
-        nextCity = ACOSelection.ChooseNextCity(currentCity, traveledRoads);
+        nextCity = ACOSelection.ChooseNextCity(currentCity, visitedCities);
 
-        if (nextCity != null) { //burada kullaným adedini eklemek için güncelleme yapabilirim (road scripti için)
+        if (nextCity != null) {
             Road road = GraphManager.Instance.GetRoadBetween(currentCity, nextCity);
 
-            // Bu yeni yolu hafýzaya ekle ki bir sonraki seçimde buraya geri dönmesin
-            if (!traveledRoads.Contains(road)) {
-                traveledRoads.Add(road);
-            }
+            if (!traveledRoads.Contains(road)) traveledRoads.Add(road);
 
-            currentWaypointParent = road.waypointParent;
-            UpdateWaypoints(currentWaypointParent);
+            if (!visitedCities.Contains(nextCity)) visitedCities.Add(nextCity);
+
+            road.useCount++;
+            UpdateWaypoints(road.waypointParent);
             currentWaypointIndex = -1;
         }
     }
@@ -103,6 +102,7 @@ public class Vehicle : MonoBehaviour
 
         // Hafýzayý temizle (bir sonraki görev için)
         traveledRoads.Clear();
+        visitedCities.Clear();
     }
 
     private void UpdateWaypoints(Transform waypointParent) {
@@ -112,22 +112,5 @@ public class Vehicle : MonoBehaviour
         }
     }
 
-    //private void TravelNextCity() {
-    //    //nextCity = RoadSelection.Instance.PickRoad(currentCity);
-
-    //    currentWaypointParent = GraphManager.Instance.GetWaypointParentBetween(currentCity, nextCity);
-    //    //waypoints = GetChildrenFromParent(currentWaypointParent);
-    //    UpdateWaypoints(currentWaypointParent);
-    //    currentWaypointIndex = -1;
-    //}
-
-    //private List<Transform> GetChildrenFromParent(Transform parent) {
-    //    List<Transform> childrenList = new List<Transform>();
-    //    foreach (Transform child in parent) {
-    //        childrenList.Add(child);
-    //    }
-
-    //    return childrenList;
-    //}
 
 }

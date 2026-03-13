@@ -6,17 +6,11 @@ public static class ACOSelection {
     public static float alpha = 1.0f; // Feromonun önemi
     public static float beta = 2.0f;  // Mesafenin önemi (Mesafe kýsa olunca çekicilik artar)
 
-    public static CitySO ChooseNextCity(CitySO currentCity, List<Road> traveledRoads) {
-        // 1. Ziyaret edilen þehirleri belirle (Tabu Listesi)
-        List<CitySO> visitedCities = new List<CitySO>();
-        foreach (Road road in traveledRoads) {
-            // Yolun hem baþlangýç hem bitiþini ekleyerek tam garantiye alýyoruz
-            if (!visitedCities.Contains(road.startCitySO)) visitedCities.Add(road.startCitySO);
-            if (!visitedCities.Contains(road.endCitySO)) visitedCities.Add(road.endCitySO);
-        }
+    public static CitySO ChooseNextCity(CitySO currentCity, List<CitySO> visitedCities) {
 
         // 2. Sadece daha önce gidilmemiþ komþularý filtrele
         List<CitySO> availableNeighbors = new List<CitySO>();
+
         foreach (CitySO neighbor in currentCity.neighbors) {
             if (!visitedCities.Contains(neighbor)) {
                 availableNeighbors.Add(neighbor);

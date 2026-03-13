@@ -16,7 +16,7 @@ public class VehicleSpawner : MonoBehaviour
         }
 
         if(spawnTimeDelta <= 0) {
-            if(currentVehicleCount > maxVehicleCount) {
+            if(currentVehicleCount >= maxVehicleCount) {
                 Debug.Log("Maksimum araç limitine ulaþýldý: " + maxVehicleCount
                     + ", spawner devre dýþý býrakýlýyor...");
                 enabled = false;
@@ -28,7 +28,7 @@ public class VehicleSpawner : MonoBehaviour
         }
     }
 
-    private void GenerateVehicle() {
+    private void GenerateVehicle() {//sýnýfa liste tanýmlanýp oluþturulan araçlar bu listeye atanabilir
         currentVehicleCount++;
         Instantiate(vehiclePrefab, transform.position, Quaternion.identity);
     }
