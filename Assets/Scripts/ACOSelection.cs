@@ -4,7 +4,7 @@ using UnityEngine;
 public static class ACOSelection {
     // ACO Katsayýlarý (Bunlarý daha sonra bir Manager'dan da çekebiliriz)
     public static float alpha = 1.0f; // Feromonun önemi
-    public static float beta = 2.0f;  // Mesafenin önemi (Mesafe kýsa olunca çekicilik artar)
+    public static float beta = 1.0f;  // Mesafenin önemi (Mesafe kýsa olunca çekicilik artar)
 
     public static CitySO ChooseNextCity(CitySO currentCity, List<CitySO> visitedCities) {
 

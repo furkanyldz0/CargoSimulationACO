@@ -17,33 +17,39 @@ public class Vehicle : MonoBehaviour
     private List<CitySO> visitedCities = new List<CitySO>(); //önceki þehirlere tekrar gitmemesi için
 
     [SerializeField] private CitySO currentCity;
-    private CitySO nextCity;
+    private CitySO homeCity, nextCity;
 
     public enum State {
-        idle,
-        traveling
+        Idle,
+        Traveling,
+        Returning
     }
 
     private void Start() {
-        state = State.traveling;
+        state = State.Traveling;
+        homeCity = currentCity;
 
         if (!visitedCities.Contains(currentCity)) visitedCities.Add(currentCity);
         TravelNextCity();
     }
 
     private void Update() {
+        Time.timeScale = 3;
+
         switch (state) {
-            case State.idle:
+            case State.Idle:
                 //Debug.Log("Araç boþta...");
                 break;
 
-            case State.traveling:
+            case State.Traveling:
                 if (currentWaypointIndex < waypoints.Count - 1) {
                     transform.position = Vector3.MoveTowards(transform.position, waypoints[currentWaypointIndex + 1].position,
                         Time.deltaTime * moveSpeed);
 
                     targetRotation = waypoints[currentWaypointIndex + 1].position - transform.position;
-                    transform.forward = Vector3.Slerp(transform.forward, targetRotation, Time.deltaTime * rotateSpeed);
+                    if (targetRotation != Vector3.zero) {
+                        transform.forward = Vector3.Slerp(transform.forward, targetRotation, Time.deltaTime * rotateSpeed);
+                    }
 
                     if (transform.position == waypoints[currentWaypointIndex + 1].position) {
                         currentWaypointIndex++;
@@ -54,14 +60,36 @@ public class Vehicle : MonoBehaviour
                             if(currentCity == GraphManager.Instance.targetCity) {
                                 //hedef þehre varýldý
                                 DepositPheromones();
-                                state = State.idle; //bundan sonra djikstra ile eve gidecek, ama þimdilik destroy edelim
-                                Destroy(gameObject);
 
+                                TravelHome(currentCity);
+                                state = State.Returning; //djikstra ile eve dönecek
+                                transform.localScale = Vector3.one * 0.5f; 
                             }
                             else {
                                 TravelNextCity();
                             }                       
                         }  
+                    }
+                }
+                break;
+
+            case State.Returning:
+                if (currentWaypointIndex < waypoints.Count - 1) {
+                    transform.position = Vector3.MoveTowards(transform.position, waypoints[currentWaypointIndex + 1].position,
+                        Time.deltaTime * moveSpeed);
+
+                    targetRotation = waypoints[currentWaypointIndex + 1].position - transform.position;
+                    if (targetRotation != Vector3.zero) {
+                        transform.forward = Vector3.Slerp(transform.forward, targetRotation, Time.deltaTime * rotateSpeed);
+                    }
+
+                    if (transform.position == waypoints[currentWaypointIndex + 1].position) {
+                        currentWaypointIndex++;
+
+                        if (currentWaypointIndex == waypoints.Count - 1) {
+                            //araç eve vardý
+                            Destroy(gameObject);
+                        }
                     }
                 }
                 break;
@@ -85,6 +113,26 @@ public class Vehicle : MonoBehaviour
         }
     }
 
+    private void TravelHome(CitySO currentCity) {
+        waypoints.Clear();
+        List<CitySO> path = Djikstra.FindShortestPath(currentCity, homeCity);
+
+        CitySO stepStart = currentCity; // Baþlangýcýmýz þu anki hedef þehir
+
+        foreach (CitySO stepEnd in path) {
+            Road road = GraphManager.Instance.GetRoadBetween(stepStart, stepEnd);
+            if (road != null) {
+                // O yola ait tüm waypointleri sýrayla ana listeye ekle
+                foreach (Transform child in road.waypointParent) {
+                    waypoints.Add(child);
+                }
+            }
+            stepStart = stepEnd; // Bir sonraki yolun baþlangýcý için þehri kaydýr
+        }
+
+        currentWaypointIndex = -1;
+    }
+
     private void DepositPheromones() {
         float totalDistance = 0;
         // 1. Toplam mesafeyi hesapla
@@ -94,7 +142,7 @@ public class Vehicle : MonoBehaviour
 
         // 2. Yol ne kadar kýsaysa o kadar çok feromon býrak (Q / L formülü)
         // Q sabit bir deðerdir (örn: 100)
-        float pheromoneToAdd = 100f / totalDistance;
+        float pheromoneToAdd = 10000f / (totalDistance * totalDistance);
 
         foreach (Road r in traveledRoads) {
             r.pheromoneLevel += pheromoneToAdd;
