@@ -338,7 +338,7 @@ GameObject:
   - component: {fileID: 252250258}
   - component: {fileID: 252250259}
   m_Layer: 0
-  m_Name: VehicleSpawner
+  m_Name: VehicleManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -372,8 +372,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VehicleSpawner
   vehiclePrefab: {fileID: 3107076115601195582, guid: 6a243fbd0e45212488abc33fb5e4a70c, type: 3}
-  maxVehicleCount: 1000
+  vehicleSpeed: 40
   spawnTime: 0.3
+  vehicleSpawnCount: 5000
 --- !u!1 &276248255
 GameObject:
   m_ObjectHideFlags: 0
@@ -2234,6 +2235,7 @@ Transform:
   - {fileID: 1394474439}
   - {fileID: 252250258}
   - {fileID: 276248256}
+  - {fileID: 1657847341}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1256379502
@@ -2667,8 +2669,6 @@ MonoBehaviour:
   - {fileID: 1677029299}
   - {fileID: 1415683411}
   - {fileID: 1256379504}
-  evaporationRate: 0.05
-  minPheromone: 0.1
   targetCity: {fileID: 11400000, guid: b0ae9ec846348ff4396855d18d3d0906, type: 2}
 --- !u!1001 &1415683409
 PrefabInstance:
@@ -3329,6 +3329,56 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8845d7939bae2d242abc5976e37dc713, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Road
+--- !u!1 &1657847340
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1657847341}
+  - component: {fileID: 1657847342}
+  m_Layer: 0
+  m_Name: ACOManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1657847341
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1657847340}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1235878922}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1657847342
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1657847340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 480680834d5f1a84e9b212b3dd548ee8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ACOManager
+  alpha: 1
+  beta: 1
+  startPheremoneLevel: 1
+  evaporationRate: 0.05
+  minPheromone: 0.1
+  Q: 10000
 --- !u!1001 &1677029297
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -5,7 +5,7 @@ public class Vehicle : MonoBehaviour
 {
     private State state;
 
-    [SerializeField] private float moveSpeed = 20f; //hareket hýzýný ileride vehiclespawner'dan ayarlayabiliriz
+    private float moveSpeed;
     private float rotateSpeed = 20f;
     private Vector3 targetRotation;
 
@@ -26,15 +26,16 @@ public class Vehicle : MonoBehaviour
     }
 
     private void Start() {
-        state = State.Traveling;
+        moveSpeed = VehicleManager.Instance.GetVehicleSpeed();
         homeCity = currentCity;
+        state = State.Traveling;
 
         if (!visitedCities.Contains(currentCity)) visitedCities.Add(currentCity);
         TravelNextCity();
     }
 
     private void Update() {
-        Time.timeScale = 3;
+        //Time.timeScale = 3; simülasyonu hýzlandýrýyor ama hýzlandýrmayý böyle yapmayacaðým
 
         switch (state) {
             case State.Idle:
@@ -61,7 +62,7 @@ public class Vehicle : MonoBehaviour
                                 //hedef þehre varýldý
                                 DepositPheromones();
 
-                                TravelHome(currentCity);
+                                TravelHome();
                                 state = State.Returning; //djikstra ile eve dönecek
                                 transform.localScale = Vector3.one * 0.5f; 
                             }
@@ -98,7 +99,7 @@ public class Vehicle : MonoBehaviour
 
     private void TravelNextCity() {
         // BURASI KRÝTÝK: Listeyi metoda parametre olarak gönderiyoruz
-        nextCity = ACOSelection.ChooseNextCity(currentCity, visitedCities);
+        nextCity = ACOManager.Instance.ChooseNextCity(currentCity, visitedCities);
 
         if (nextCity != null) {
             Road road = GraphManager.Instance.GetRoadBetween(currentCity, nextCity);
@@ -113,7 +114,7 @@ public class Vehicle : MonoBehaviour
         }
     }
 
-    private void TravelHome(CitySO currentCity) {
+    private void TravelHome() {
         waypoints.Clear();
         List<CitySO> path = Djikstra.FindShortestPath(currentCity, homeCity);
 
@@ -134,21 +135,8 @@ public class Vehicle : MonoBehaviour
     }
 
     private void DepositPheromones() {
-        float totalDistance = 0;
-        // 1. Toplam mesafeyi hesapla
-        foreach (Road r in traveledRoads) {
-            totalDistance += r.distance;
-        }
+        ACOManager.Instance.AddPheromones(traveledRoads);
 
-        // 2. Yol ne kadar kýsaysa o kadar çok feromon býrak (Q / L formülü)
-        // Q sabit bir deðerdir (örn: 100)
-        float pheromoneToAdd = 10000f / (totalDistance * totalDistance);
-
-        foreach (Road r in traveledRoads) {
-            r.pheromoneLevel += pheromoneToAdd;
-        }
-
-        // Hafýzayý temizle (bir sonraki görev için)
         traveledRoads.Clear();
         visitedCities.Clear();
     }

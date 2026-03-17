@@ -11,11 +11,8 @@ public class Road : MonoBehaviour {
     public CitySO endCitySO;
     public Transform waypointParent;
 
-    private City startCity;
-    private City endCity;
-
     public float distance;
-    public float pheromoneLevel = 1f;
+    public float pheromoneLevel; //ilk deðer AcoManager'dan alýnýyor
     public int useCount = 0;
 
     [SerializeField] private TextMeshProUGUI distanceText;
@@ -26,9 +23,6 @@ public class Road : MonoBehaviour {
     private float textUpdateTime, textUpdateTimeDelta;
 
     private void Start() {
-        startCity = CityPool.Instance.GetCityForCitySO(startCitySO);
-        endCity = CityPool.Instance.GetCityForCitySO(endCitySO);
-
         CalculateDistance();
 
         textUpdateTime = 1f / textUpdateCountPerSecond;

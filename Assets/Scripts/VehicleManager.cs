@@ -1,14 +1,26 @@
 using System;
 using UnityEngine;
 
-public class VehicleSpawner : MonoBehaviour
+public class VehicleManager : MonoBehaviour
 {
+    public static VehicleManager Instance { get; private set; }
+
     [SerializeField] private GameObject vehiclePrefab;
-    [SerializeField] private int maxVehicleCount;
+
+    [Header("Araç özellikleri")]
+    [SerializeField] private float vehicleSpeed = 40f;
     [SerializeField] private float spawnTime = 1f;
+    [SerializeField] private int vehicleSpawnCount;
 
     private int currentVehicleCount = 0;
     private float spawnTimeDelta;
+
+    private void Awake() {
+        if(Instance != null) {
+            Debug.LogError("Sahnede birden fazla VehicleSpawner var!");
+        }
+        Instance = this;
+    }
 
     private void Update() {
         if(spawnTimeDelta > 0) {
@@ -16,8 +28,8 @@ public class VehicleSpawner : MonoBehaviour
         }
 
         if(spawnTimeDelta <= 0) {
-            if(currentVehicleCount >= maxVehicleCount) {
-                Debug.Log("Maksimum araç limitine ulaþýldý: " + maxVehicleCount
+            if(currentVehicleCount >= vehicleSpawnCount) {
+                Debug.Log("Maksimum araç limitine ulaþýldý: " + vehicleSpawnCount
                     + ", spawner devre dýþý býrakýlýyor...");
                 enabled = false;
             }
@@ -31,5 +43,9 @@ public class VehicleSpawner : MonoBehaviour
     private void GenerateVehicle() {//sýnýfa liste tanýmlanýp oluþturulan araçlar bu listeye atanabilir
         currentVehicleCount++;
         Instantiate(vehiclePrefab, transform.position, Quaternion.identity);
+    }
+
+    public float GetVehicleSpeed() {
+        return vehicleSpeed;
     }
 }
