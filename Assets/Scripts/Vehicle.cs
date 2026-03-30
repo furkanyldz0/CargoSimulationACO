@@ -19,6 +19,8 @@ public class Vehicle : MonoBehaviour
     [SerializeField] private CitySO currentCity;
     private CitySO homeCity, nextCity;
 
+    [SerializeField] private GameObject cargoPackageVisual;
+
     public enum State {
         Idle,
         Traveling,
@@ -64,7 +66,7 @@ public class Vehicle : MonoBehaviour
 
                                 TravelHome();
                                 state = State.Returning; //djikstra ile eve dönecek
-                                transform.localScale = Vector3.one * 0.5f; 
+                                cargoPackageVisual.SetActive(false);
                             }
                             else {
                                 TravelNextCity();

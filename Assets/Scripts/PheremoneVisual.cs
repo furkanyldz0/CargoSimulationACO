@@ -12,7 +12,6 @@ public class PheremoneVisual : MonoBehaviour
     private void Start() {
         road = GetComponent<Road>();
         color = roadMeshRenderer.sharedMaterial.color;
-        Debug.Log(color.a);
 
         propertyBlock = new MaterialPropertyBlock();
     }
