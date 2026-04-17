@@ -1,11 +1,14 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class GraphManager : MonoBehaviour
 {
     public static GraphManager Instance { get; private set; }
 
-    [SerializeField] private List<Road> allRoads; // Tüm yollarý buraya sürükleyip býrakacaksýn
+    //[SerializeField] private List<Road> allRoads; //sürekli sürükleyip býrakmamak için parent kullanacaðým
+    [SerializeField] private Transform RoadParent;
+    private List<Road> allRoads = new List<Road>();
 
     public CitySO targetCity;
 
@@ -14,6 +17,8 @@ public class GraphManager : MonoBehaviour
             Debug.LogError("sahnede birden fazla GraphManager var!");
         }
         Instance = this;
+
+        allRoads = RoadParent.GetComponentsInChildren<Road>().ToList();
     }
 
     public Road GetRoadBetween(CitySO startCity, CitySO endCity) {

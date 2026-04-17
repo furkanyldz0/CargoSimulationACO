@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f586d2373bb9f634693684d4b93b018d, type: 3}
-  m_Name: A
+  m_Name: O
   m_EditorClassIdentifier: Assembly-CSharp::CitySO
-  cityName: A
+  cityName: O
   neighbors:
-  - {fileID: 11400000, guid: 4ddc40bbdbedccb4fbb8be1c8ec62ffd, type: 2}
-  - {fileID: 11400000, guid: be26ef9848876d14b9ee0cd3713f6207, type: 2}
-  - {fileID: 11400000, guid: b0ae9ec846348ff4396855d18d3d0906, type: 2}
+  - {fileID: 11400000, guid: f1fb6ce96e342e041af52316f7f61f64, type: 2}
+  - {fileID: 11400000, guid: 48d6255b95b063b44b869a20172061c5, type: 2}
+  - {fileID: 11400000, guid: 9316689853a40374184de999699f3863, type: 2}

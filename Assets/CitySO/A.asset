@@ -15,3 +15,5 @@ MonoBehaviour:
   cityName: A
   neighbors:
   - {fileID: 11400000, guid: 9709b48aaae1e984da0742e6c5f68635, type: 2}
+  - {fileID: 11400000, guid: 0a1aa1ec59f0ae342b4a4b44bff07813, type: 2}
+  - {fileID: 11400000, guid: 3f17161e034abfd4f9eaed5e672cae69, type: 2}

@@ -14,4 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CitySO
   cityName: C
   neighbors:
+  - {fileID: 11400000, guid: 4bfe0871ed8e41a489cc75809c44b63e, type: 2}
   - {fileID: 11400000, guid: 9709b48aaae1e984da0742e6c5f68635, type: 2}
+  - {fileID: 11400000, guid: 3f17161e034abfd4f9eaed5e672cae69, type: 2}
+  - {fileID: 11400000, guid: be1a0c07f8b46a2409fd0ce17b21b818, type: 2}
