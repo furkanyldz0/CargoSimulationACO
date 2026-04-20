@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ACOManager :MonoBehaviour {
+public class ACOManager : MonoBehaviour {
 
     public static ACOManager Instance { get; private set; }
 

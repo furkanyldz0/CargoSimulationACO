@@ -11,7 +11,7 @@ public class DualNetworkBuilder : MonoBehaviour {
 
     [Header("Þerit Ayarlarý")]
     public float laneOffset = 1.5f;
-    public float roadHeightOffset = 0.3f; // YENÝ: Yüksekliði Inspector'dan ayarlayabilmen için eklendi
+    public float roadHeightOffset = 0.3f;
 
     [ContextMenu("Yol Aðýný Baþtan Ör")]
     public void BuildDualNetwork() {
@@ -40,8 +40,6 @@ public class DualNetworkBuilder : MonoBehaviour {
                 CitySO endSO = endCity.GetCitySO();
                 string directionalKey = $"{startSO.cityName}->{endSO.cityName}";
 
-                Debug.Log(directionalKey);
-
                 if (!createdConnections.Contains(directionalKey)) {
                     CreateRoad(startCity, endCity, startSO, endSO);
                     createdConnections.Add(directionalKey);
@@ -51,26 +49,33 @@ public class DualNetworkBuilder : MonoBehaviour {
     }
 
     private void CreateRoad(City startCity, City endCity, CitySO startSO, CitySO endSO) {
+        // 1. Yön ve Þerit Kaydýrma
         Vector3 direction = (endCity.transform.position - startCity.transform.position).normalized;
         Vector3 rightVector = Vector3.Cross(direction, Vector3.up).normalized;
 
         Vector3 worldStart = startCity.transform.position + (rightVector * laneOffset);
         Vector3 worldEnd = endCity.transform.position + (rightVector * laneOffset);
 
+        // --- YENÝ EKLENEN KISIM: Merkez ve Rotasyon Hesaplamasý ---
+        // Ýki noktanýn tam ortasýný buluyoruz
+        Vector3 midPoint = (worldStart + worldEnd) / 2f;
+
         GameObject roadObj = (GameObject)PrefabUtility.InstantiatePrefab(roadPrefab, networkParent);
         roadObj.name = $"Road {startSO.cityName}-{endSO.cityName}";
 
-        roadObj.transform.position = Vector3.zero;
-        roadObj.transform.rotation = Quaternion.identity;
+        // Objeyi 0,0,0 yerine tam ortaya yerleþtiriyoruz ve hedefe doðru döndürüyoruz
+        roadObj.transform.position = midPoint;
+        if (direction != Vector3.zero) {
+            roadObj.transform.rotation = Quaternion.LookRotation(direction);
+        }
+        // -----------------------------------------------------------
 
-        // 1. Road verilerini ana objeden ata
         Road roadScript = roadObj.GetComponent<Road>();
         if (roadScript != null) {
             roadScript.startCitySO = startSO;
             roadScript.endCitySO = endSO;
         }
 
-        // 2. Alt objedeki (Child) SplineContainer'ý bul
         SplineContainer container = roadObj.GetComponentInChildren<SplineContainer>();
         if (container != null) {
             Undo.RecordObject(container, "Spline Update");
@@ -80,11 +85,11 @@ public class DualNetworkBuilder : MonoBehaviour {
             Spline mySpline = container.Splines[0];
             mySpline.Clear();
 
-            // ÖNEMLÝ: Koordinat dönüþümünü spline'ý içeren objenin transformuyla yapýyoruz
+            // Objeyi taþýdýðýmýz ve döndürdüðümüz için InverseTransformPoint bize 
+            // merkezden eþit uzaklýkta (+Z ve -Z yönünde) yerel noktalar verecektir.
             float3 localStart = container.transform.InverseTransformPoint(worldStart);
             float3 localEnd = container.transform.InverseTransformPoint(worldEnd);
 
-            // YENÝ: Spline knot'larýnýn yerel Y (yükseklik) deðerini sabitliyoruz
             localStart.y = roadHeightOffset;
             localEnd.y = roadHeightOffset;
 
@@ -94,7 +99,6 @@ public class DualNetworkBuilder : MonoBehaviour {
             EditorUtility.SetDirty(container);
         }
 
-        // 3. Alt objedeki Waypoint Generator'ý tetikle
         SplineWaypointGenerator wpGen = roadObj.GetComponentInChildren<SplineWaypointGenerator>();
         if (wpGen != null) {
             wpGen.sideOffset = 0f;

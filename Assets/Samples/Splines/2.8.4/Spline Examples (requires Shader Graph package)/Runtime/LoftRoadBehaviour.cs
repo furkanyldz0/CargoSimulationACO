@@ -321,8 +321,12 @@ namespace Unity.Splines.Examples
                 m_Positions.Add(pos + (tangent * w));
                 m_Normals.Add(up);
                 m_Normals.Add(up);
-                m_Textures.Add(new Vector2(0f, t * m_TextureScale));
-                m_Textures.Add(new Vector2(1f, t * m_TextureScale));
+
+                // --- DEÐÝÞTÝRÝLEN KISIM: UV (Texture) Atamasý ---
+                // 't' deðerini yolun toplam uzunluðu (length) ile çarparak UV uzamasýný engelliyoruz.
+                m_Textures.Add(new Vector2(0f, (t * length * .1f) * m_TextureScale));
+                m_Textures.Add(new Vector2(1f, (t * length * .1f) * m_TextureScale));
+                // ------------------------------------------------
 
                 t = math.min(1f, t + segmentStepT);
             }

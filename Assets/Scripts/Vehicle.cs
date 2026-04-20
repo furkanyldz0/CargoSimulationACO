@@ -102,7 +102,7 @@ public class Vehicle : MonoBehaviour
     private void TravelNextCity() {
         // BURASI KRÝTÝK: Listeyi metoda parametre olarak gönderiyoruz
         nextCity = ACOManager.Instance.ChooseNextCity(currentCity, visitedCities);
-        Debug.Log(nextCity);
+        //Debug.Log(nextCity);
 
         if (nextCity != null) {
             Road road = GraphManager.Instance.GetRoadBetween(currentCity, nextCity);
