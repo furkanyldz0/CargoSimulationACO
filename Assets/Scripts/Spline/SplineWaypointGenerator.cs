@@ -5,65 +5,62 @@ using System.Collections.Generic;
 
 [RequireComponent(typeof(SplineContainer))]
 public class SplineWaypointGenerator : MonoBehaviour {
-    [Header("Ayarlar")]
-    public float spacing = 2.0f;
-    public float sideOffset = 0f;
-    public string waypointPrefix = "Waypoint ";
 
-    [Header("Hiyerarþi")]
-    public Transform outputParent;
+    [SerializeField] private float waypointSpacing = 5.0f;
+    [SerializeField] private Transform outputParent;
 
     public void GenerateWaypoints() {
-        SplineContainer container = GetComponent<SplineContainer>();
-        Transform parentTransform = outputParent != null ? outputParent : transform;
+        if (outputParent == null)
+            Debug.LogError(this + ", Road'da waypointler için outputParent atanmamýþ!");
 
-        // 1. ESKÝLERÝ TEMÝZLE: Artýk kontrol yok, parent altýndaki her þeyi siliyoruz.
-        List<GameObject> toDestroy = new List<GameObject>();
-        foreach (Transform child in parentTransform) {
-            toDestroy.Add(child.gameObject);
-        }
-
-        foreach (var obj in toDestroy) {
-#if UNITY_EDITOR
-            UnityEditor.Undo.DestroyObjectImmediate(obj);
-#endif
-        }
-
-        // 2. YENÝLERÝ OLUÞTUR
-        for (int sIndex = 0; sIndex < container.Splines.Count; sIndex++) {
-            var spline = container.Splines[sIndex];
-            float length = spline.GetLength();
-            int count = Mathf.FloorToInt(length / spacing);
-
-            for (int i = 0; i <= count; i++) {
-                float t = (i * spacing) / length;
-                if (t > 1.0f) t = 1.0f;
-
-                float3 localPos = spline.EvaluatePosition(t);
-                float3 tangent = spline.EvaluateTangent(t);
-                float3 up = spline.EvaluateUpVector(t);
-
-                float3 right = math.cross(tangent, up);
-                right = math.normalize(right);
-
-                float3 offsetPos = localPos + (right * sideOffset);
-                Vector3 worldPos = transform.TransformPoint((Vector3)offsetPos);
-
-                // Direkt numaralandýrma
-                GameObject wp = new GameObject($"{waypointPrefix} {i}");
-                wp.transform.position = worldPos;
-
-                // DOÐRUDAN PARENT ATAMASI (Araya grup objesi koymadan)
-                wp.transform.SetParent(parentTransform);
-
-                wp.transform.forward = transform.TransformDirection((Vector3)tangent);
-
-#if UNITY_EDITOR
-                UnityEditor.Undo.RegisterCreatedObjectUndo(wp, "Create Waypoint");
-#endif
-            }
-        }
-
-        Debug.Log($"Toplam {container.Splines.Count} spline için waypointler doðrudan parent altýna üretildi.");
+        DestroyPreviousWaypoints();
+        CreateNewWaypoints();
     }
+
+    private void DestroyPreviousWaypoints() {
+        List<GameObject> waypointsToDestroy = new List<GameObject>();
+
+        foreach (Transform child in outputParent) {
+            waypointsToDestroy.Add(child.gameObject);
+        }
+
+        foreach (var waypoint in waypointsToDestroy) {
+#if UNITY_EDITOR
+            UnityEditor.Undo.DestroyObjectImmediate(waypoint); //undo silme iþlemini hafýzaya almasý için
+#endif //build ederken unity if bölgesini görmezden gelir, unityeditor kütüphanesi sadece oyun geliþtirilirken geçerli olur
+        }//bu bölge belirtilmezse build edilirken bu kýsýmda hata verir
+    }
+
+    private void CreateNewWaypoints() {
+        //spline uzunluðuna göre waypoint aralýklarýndan wp adedini hesaplýyoruz sonra aralýklarla oluþturuyoruz
+        SplineContainer splineContainer = GetComponent<SplineContainer>();
+        var spline = splineContainer.Splines[0];
+
+        if (splineContainer.Splines.Count > 1)
+            Debug.LogError(this + "'da birden fazla spline var!");
+
+        float length = spline.GetLength();
+        int waypointCount = Mathf.FloorToInt(length / waypointSpacing);
+
+        for (int i = 0; i <= waypointCount; i++) {
+            float t = (i * waypointSpacing) / length;
+            if (t > 1.0f) t = 1.0f;
+
+            float3 localPos = spline.EvaluatePosition(t); //yüzdelik olarak spline'da i indexinin konum olarak karþýlýðýný buluyor
+            float3 tangent = spline.EvaluateTangent(t); //ileri yön vektörü karþýlýðý
+
+            Vector3 worldPos = transform.TransformPoint((Vector3)localPos);
+
+            GameObject waypoint = new GameObject($"Waypoint {i}");
+            waypoint.transform.position = worldPos;
+            waypoint.transform.SetParent(outputParent);
+            waypoint.transform.forward = transform.TransformDirection((Vector3)tangent);
+
+#if UNITY_EDITOR
+            UnityEditor.Undo.RegisterCreatedObjectUndo(waypoint, "Create Waypoint");
+#endif
+        }
+    }
+
+    
 }

@@ -21,4 +21,8 @@ public class CityPool : MonoBehaviour
         }
         return null;
     }
+
+    public City[] GetAllCities() {
+        return cities;
+    }
 }

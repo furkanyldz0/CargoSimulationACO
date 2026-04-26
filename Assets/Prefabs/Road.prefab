@@ -152,7 +152,7 @@ GameObject:
   - component: {fileID: 3048726622832265135}
   - component: {fileID: 5669161166697566225}
   m_Layer: 0
-  m_Name: RoadVisual
+  m_Name: RoadSpline
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -302,9 +302,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e113435bd35954848ac4051d9d8d0a2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SplineWaypointGenerator
-  spacing: 5
-  sideOffset: 0
-  waypointPrefix: Waypoint
+  waypointSpacing: 5
   outputParent: {fileID: 3030578226496027512}
 --- !u!1 &969420417088502665
 GameObject:
@@ -764,7 +762,6 @@ GameObject:
   - component: {fileID: 7783822697451152577}
   - component: {fileID: 7080021779175010718}
   - component: {fileID: 546356928378131368}
-  - component: {fileID: 41751372437670512}
   m_Layer: 0
   m_Name: Road
   m_TagString: Untagged
@@ -809,9 +806,6 @@ MonoBehaviour:
   distance: 100
   pheromoneLevel: 1
   useCount: 0
-  distanceText: {fileID: 6702723905648511510}
-  pheromoneText: {fileID: 1057448618460590042}
-  useCountText: {fileID: 6546787202995692191}
 --- !u!114 &546356928378131368
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -824,25 +818,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5233a50d360c43c419f542648e98c798, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NewMonoBehaviourScript
-  lineRenderer: {fileID: 2923747841844028567}
-  splineContainer: {fileID: 0}
   heightOffset: 0.05
-  resolution: 20
-  maxThickness: 8
-  maxExpectedPheromone: 100
---- !u!114 &41751372437670512
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6940333402699782926}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9280f1a8cc4025f44bf8bdb78dd9ab29, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: "Assembly-CSharp::L\u0130neRendererTest"
-  roadMeshRenderer: {fileID: 0}
+  resolution: 50
+  maxThickness: 6
+  maxPheromoneLimitToVisualized: 100
+  lineRenderer: {fileID: 2923747841844028567}
+  splineContainer: {fileID: 4466603990768156437}
 --- !u!1 &8639687309397867509
 GameObject:
   m_ObjectHideFlags: 0

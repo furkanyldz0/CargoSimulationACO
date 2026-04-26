@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class VehicleManager : MonoBehaviour
@@ -8,10 +10,11 @@ public class VehicleManager : MonoBehaviour
     [SerializeField] private GameObject vehiclePrefab;
 
     [Header("Araç özellikleri")]
-    [SerializeField] private float vehicleSpeed = 40f;
+    [SerializeField] private int vehicleSpeed = 40;
     [SerializeField] private float spawnTime = 1f;
     [SerializeField] private int vehicleSpawnCount;
 
+    private List<Vehicle> currentAllVehicles = new List<Vehicle>();
     private int currentVehicleCount = 0;
     private float spawnTimeDelta;
 
@@ -20,6 +23,8 @@ public class VehicleManager : MonoBehaviour
             Debug.LogError("Sahnede birden fazla VehicleSpawner var!");
         }
         Instance = this;
+
+
     }
 
     private void Update() {
@@ -45,7 +50,36 @@ public class VehicleManager : MonoBehaviour
         Instantiate(vehiclePrefab, transform.position, Quaternion.identity);
     }
 
-    public float GetVehicleSpeed() {
+    private void ChangeAllVehicleSpeeds(int vehicleSpeed) {
+        currentAllVehicles = FindObjectsByType<Vehicle>(FindObjectsSortMode.None).ToList(); //performans açýsýndan sýkýntý yaratýr mý acaba
+        foreach (Vehicle vehicle in currentAllVehicles) {
+            vehicle.SetSpeed(vehicleSpeed);
+        }
+    }
+
+    public int GetVehicleSpeed() {
         return vehicleSpeed;
+    }
+
+    public void SetVehicleSpeed(int vehicleSpeed) {
+        this.vehicleSpeed = vehicleSpeed;
+        ChangeAllVehicleSpeeds(vehicleSpeed); //sahnedeki mevcut araçlarýn da hýzlarýný güncellememiz gerekiyor
+    }
+
+    public float GetSpawnTime() {
+        return spawnTime;
+    }
+
+    public void SetSpawnTime(float spawnTime) {
+        this.spawnTime = spawnTime;
+        spawnTimeDelta = spawnTime; //sayaç bunun üzerinden hesaplandýðýndan spawntime güncellendiðinde gecikme oluyor
+    }
+
+    public int GetVehicleSpawnCount() {
+        return vehicleSpawnCount;
+    }
+
+    public void SetVehicleSpawnCount(int vehicleSpawnCount) {
+        this.vehicleSpawnCount = vehicleSpawnCount;
     }
 }

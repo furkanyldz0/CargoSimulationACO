@@ -3,18 +3,14 @@ using UnityEngine.Splines;
 using UnityEngine.Splines.ExtrusionShapes;
 
 public class PheromoneVisualizer : MonoBehaviour {
-    [Header("Bileþenler")]
-    public LineRenderer lineRenderer;
-    public SplineContainer splineContainer;
 
-    [Header("Feromon Görsel Ayarlarý")]
-    public float heightOffset = 0f;
-    public int resolution = 20;
+    [SerializeField] private float heightOffset = 0f;
+    [SerializeField] private int resolution = 20; //spline'nýn kavisli olmasý durumunda yumuþak geçiþ için
+    [SerializeField] private float maxThickness = 8.0f; // Maksimum kalýnlýk
+    [SerializeField] private float maxPheromoneLimitToVisualized = 100f; // Ulaþýlmasýný beklediðimiz maksimum feromon
 
-    [Header("Kalýnlýk Sýnýrlarý")]
-    public float maxThickness = 8.0f; // Maksimum kalýnlýk
-    public float maxExpectedPheromone = 100f; // Ulaþýlmasýný beklediðimiz maksimum feromon
-
+    [SerializeField] private LineRenderer lineRenderer;
+    [SerializeField] private SplineContainer splineContainer;
     private Road road;
 
     void Start() {
@@ -24,7 +20,6 @@ public class PheromoneVisualizer : MonoBehaviour {
 
         DrawPheromonePath();
 
-        // BAÞLANGIÇTA TAMAMEN GÖRÜNMEZ (WIDTH = 0)
         lineRenderer.startWidth = 0f;
         lineRenderer.endWidth = 0f;
     }
@@ -34,34 +29,33 @@ public class PheromoneVisualizer : MonoBehaviour {
     }
 
     private void DrawPheromonePath() {
-        if (splineContainer == null || splineContainer.Splines.Count == 0) return;
+        if (splineContainer == null || splineContainer.Splines.Count == 0)
+            Debug.LogError(this + " için splineContainer atanmamýþ veya spline içermiyor!");
 
         var spline = splineContainer.Splines[0];
         lineRenderer.positionCount = resolution;
 
         for (int i = 0; i < resolution; i++) {
-            float t = i / (float)(resolution - 1);
+            float t = i / (float)(resolution - 1); //noktalarýn yüzdeðiline göre spline üzerinde konumlarýný ayarlayacaðýz
+
             Vector3 localPos = spline.EvaluatePosition(t);
-            Vector3 worldPos = splineContainer.transform.TransformPoint(localPos);
+            Vector3 worldPos = splineContainer.transform.TransformPoint(localPos); //localpos'dan worldpos'u buluyoruz
 
             worldPos.y += heightOffset;
             lineRenderer.SetPosition(i, worldPos);
         }
     }
 
-    // Feromon deðiþtikçe bu metot çalýþacak
     public void UpdatePheromoneVisual(float currentPheromoneAmount) {
-        //Feromon oranýný 0 ile 1 arasýna sýkýþtýrýyoruz(Eðer feromon eksiye düþerse veya max'ý aþarsa diye)
-        float normalizedLevel = Mathf.Clamp01(currentPheromoneAmount / maxExpectedPheromone);
+        //feromon zoranýný 0 ile 1 arasýna sabitliyoruz
+        float normalizedLevel = Mathf.Clamp01(currentPheromoneAmount / maxPheromoneLimitToVisualized); //öncekinde alfa deðerinde nasýl 0 ile 1 arasý sabitliyorsak burada da kalýnlýðýn yüzdeliðini hesaplýyoruz
 
-        // Ulaþmasý gereken net kalýnlýðý hesaplýyoruz
-        float targetWidth = normalizedLevel * maxThickness;
+        float targetWidth = normalizedLevel * maxThickness; //bi nevi 0-1 clamp iþlemi yapýyoruz gibi ama çarparak
 
         if (currentPheromoneAmount <= 0.1f) {
             targetWidth = 0f;
         }
 
-        // Çarpan (multiplier) yerine doðrudan gerçek kalýnlýk deðerlerini ayarlýyoruz
         lineRenderer.startWidth = targetWidth;
         lineRenderer.endWidth = targetWidth;
     }

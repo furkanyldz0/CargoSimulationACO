@@ -5,78 +5,95 @@ using Unity.Mathematics;
 using System.Collections.Generic;
 
 public class DualNetworkBuilder : MonoBehaviour {
-    [Header("Kurulum")]
-    public GameObject roadPrefab;
-    public Transform networkParent;
 
-    [Header("Þerit Ayarlarý")]
-    public float laneOffset = 1.5f;
-    public float roadHeightOffset = 0.3f;
+    [SerializeField] private GameObject roadPrefab;
+    [SerializeField] private Transform networkParent;
 
-    [ContextMenu("Yol Aðýný Baþtan Ör")]
+    [Header("Yol dizilimi ayarlarý")]
+    [SerializeField] private float laneOffset = -2.15f; //iki yolun birbirine yakýnlýðý
+    [SerializeField] private float roadHeightOffset = 0f;
+
     public void BuildDualNetwork() {
-        if (roadPrefab == null) {
-            Debug.LogError("HATA: Lütfen Road Prefab'ýný atayýn!");
-            return;
+        if (roadPrefab == null) 
+            Debug.LogError(this + " için Road prefabi atanmamýþ!");
+
+        if (networkParent == null)
+            Debug.LogError(this + " için networkParent belirlenmemiþ!");
+
+        for (int i = networkParent.childCount - 1; i >= 0; i--) {
+            Undo.DestroyObjectImmediate(networkParent.GetChild(i).gameObject);
         }
 
-        if (networkParent != null) {
-            for (int i = networkParent.childCount - 1; i >= 0; i--) {
-                Undo.DestroyObjectImmediate(networkParent.GetChild(i).gameObject);
-            }
-        }
+        City[] allCities = FindObjectsByType<City>(FindObjectsSortMode.None);
 
-        City[] allCities = Object.FindObjectsByType<City>(FindObjectsSortMode.None);
-        HashSet<string> createdConnections = new HashSet<string>();
+        System.Array.Sort(allCities, (cityA, cityB) => {
+            string nameA = cityA.GetCitySO().cityName;
+            string nameB = cityB.GetCitySO().cityName;
+
+            return nameA.CompareTo(nameB);
+        }); //so isimlerine göre sýralýyoruz
+
+        HashSet<string> createdConnections = new HashSet<string>(); //set -> liste yapýsýna göre contains metodunu daha hýzlý bir þekilde gerçekleþtirir
 
         foreach (City startCity in allCities) {
-            CitySO startSO = startCity.GetCitySO();
-            if (startSO == null || startSO.neighbors == null) continue;
+            CitySO startCitySO = startCity.GetCitySO();
 
-            foreach (CitySO neighborSO in startSO.neighbors) {
-                City endCity = FindCityBySO(allCities, neighborSO);
-                if (endCity == null) continue;
+            if (startCitySO.neighbors == null) continue; //komþusu yoksa atla
 
-                CitySO endSO = endCity.GetCitySO();
-                string directionalKey = $"{startSO.cityName}->{endSO.cityName}";
+            foreach (CitySO neighborCitySO in startCitySO.neighbors) {
+                City endCity = GetCityForCitySO(neighborCitySO, allCities);
+                if (endCity == null) {
+                    Debug.Log($"{neighborCitySO} için transform atanmamýþ!");
+                    continue;
+                }
+
+                CitySO endCitySO = endCity.GetCitySO();
+                string directionalKey = $"{startCitySO.cityName}->{endCitySO.cityName}";
 
                 if (!createdConnections.Contains(directionalKey)) {
-                    CreateRoad(startCity, endCity, startSO, endSO);
+                    CreateRoad(startCity, endCity);
                     createdConnections.Add(directionalKey);
                 }
             }
         }
     }
 
-    private void CreateRoad(City startCity, City endCity, CitySO startSO, CitySO endSO) {
+    private void CreateRoad(City startCity, City endCity) {
+        CitySO startCitySO = startCity.GetCitySO();
+        CitySO endCitySO = endCity.GetCitySO();
+
         // 1. Yön ve Þerit Kaydýrma
         Vector3 direction = (endCity.transform.position - startCity.transform.position).normalized;
-        Vector3 rightVector = Vector3.Cross(direction, Vector3.up).normalized;
+        Vector3 rightVector = Vector3.Cross(direction, Vector3.up).normalized; //yönün sað vektörünü verir
+        //örn a->b b->a yönleri zýt olduðundan kendi yönlerinin saðýný verir
 
-        Vector3 worldStart = startCity.transform.position + (rightVector * laneOffset);
-        Vector3 worldEnd = endCity.transform.position + (rightVector * laneOffset);
+        Vector3 roadStartPosition = startCity.transform.position + (rightVector * laneOffset);
+        Vector3 roadEndPosition = endCity.transform.position + (rightVector * laneOffset);
 
-        // --- YENÝ EKLENEN KISIM: Merkez ve Rotasyon Hesaplamasý ---
         // Ýki noktanýn tam ortasýný buluyoruz
-        Vector3 midPoint = (worldStart + worldEnd) / 2f;
+        Vector3 midPoint = (roadStartPosition + roadEndPosition) / 2f;
 
-        GameObject roadObj = (GameObject)PrefabUtility.InstantiatePrefab(roadPrefab, networkParent);
-        roadObj.name = $"Road {startSO.cityName}-{endSO.cityName}";
+        GameObject roadObject = (GameObject)PrefabUtility.InstantiatePrefab(roadPrefab, networkParent);
+        roadObject.name = $"Road {startCitySO.cityName}-{endCitySO.cityName}";
 
         // Objeyi 0,0,0 yerine tam ortaya yerleþtiriyoruz ve hedefe doðru döndürüyoruz
-        roadObj.transform.position = midPoint;
+        roadObject.transform.position = midPoint;
         if (direction != Vector3.zero) {
-            roadObj.transform.rotation = Quaternion.LookRotation(direction);
+            roadObject.transform.rotation = Quaternion.LookRotation(direction);
         }
-        // -----------------------------------------------------------
 
-        Road roadScript = roadObj.GetComponent<Road>();
+        Road roadScript = roadObject.GetComponent<Road>();
         if (roadScript != null) {
-            roadScript.startCitySO = startSO;
-            roadScript.endCitySO = endSO;
+            roadScript.startCitySO = startCitySO;
+            roadScript.endCitySO = endCitySO;
         }
 
-        SplineContainer container = roadObj.GetComponentInChildren<SplineContainer>();
+        GenerateSplineConnection(roadObject, roadStartPosition, roadEndPosition);
+        GenerateWaypoints(roadObject);
+    }
+
+    private void GenerateSplineConnection(GameObject roadObject, Vector3 roadStartPosition, Vector3 roadEndPosition) {
+        SplineContainer container = roadObject.GetComponentInChildren<SplineContainer>();
         if (container != null) {
             Undo.RecordObject(container, "Spline Update");
 
@@ -86,9 +103,9 @@ public class DualNetworkBuilder : MonoBehaviour {
             mySpline.Clear();
 
             // Objeyi taþýdýðýmýz ve döndürdüðümüz için InverseTransformPoint bize 
-            // merkezden eþit uzaklýkta (+Z ve -Z yönünde) yerel noktalar verecektir.
-            float3 localStart = container.transform.InverseTransformPoint(worldStart);
-            float3 localEnd = container.transform.InverseTransformPoint(worldEnd);
+            // merkezden eþit uzaklýkta (+Z ve -Z yönünde) "yerel" noktalar verecektir.
+            float3 localStart = container.transform.InverseTransformPoint(roadStartPosition);
+            float3 localEnd = container.transform.InverseTransformPoint(roadEndPosition);
 
             localStart.y = roadHeightOffset;
             localEnd.y = roadHeightOffset;
@@ -98,18 +115,24 @@ public class DualNetworkBuilder : MonoBehaviour {
 
             EditorUtility.SetDirty(container);
         }
+    }
 
-        SplineWaypointGenerator wpGen = roadObj.GetComponentInChildren<SplineWaypointGenerator>();
-        if (wpGen != null) {
-            wpGen.sideOffset = 0f;
-            wpGen.GenerateWaypoints();
+    private void GenerateWaypoints(GameObject roadObj) {
+        SplineWaypointGenerator waypointGenerator = roadObj.GetComponentInChildren<SplineWaypointGenerator>();
+        if (waypointGenerator != null) {
+            waypointGenerator.GenerateWaypoints();
         }
 
         Undo.RegisterCreatedObjectUndo(roadObj, "Create Road");
     }
 
-    private City FindCityBySO(City[] cities, CitySO so) {
-        foreach (var c in cities) if (c.GetCitySO() == so) return c;
+    private City GetCityForCitySO(CitySO citySO, City[] cities) {
+        foreach (City c in cities) {
+            if (c.GetCitySO() == citySO) {
+                return c;
+            }
+        }
         return null;
     }
+
 }

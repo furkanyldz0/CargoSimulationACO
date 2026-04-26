@@ -5,7 +5,7 @@ public class Vehicle : MonoBehaviour
 {
     private State state;
 
-    private float moveSpeed;
+    private int moveSpeed;
     private float rotateSpeed = 20f;
     private Vector3 targetRotation;
 
@@ -151,5 +151,8 @@ public class Vehicle : MonoBehaviour
         }
     }
 
+    public void SetSpeed(int moveSpeed) {
+        this.moveSpeed = moveSpeed;
+    }
 
 }
