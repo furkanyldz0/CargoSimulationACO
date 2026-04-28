@@ -13,6 +13,7 @@ public class VehicleManager : MonoBehaviour
     [SerializeField] private int vehicleSpeed = 40;
     [SerializeField] private float spawnTime = 1f;
     [SerializeField] private int vehicleSpawnCount;
+    [SerializeField] private float timeScale = 1;
 
     private List<Vehicle> currentAllVehicles = new List<Vehicle>();
     private int currentVehicleCount = 0;
@@ -23,8 +24,10 @@ public class VehicleManager : MonoBehaviour
             Debug.LogError("Sahnede birden fazla VehicleSpawner var!");
         }
         Instance = this;
+    }
 
-
+    private void Start() {
+        SetTimeScale(1f);
     }
 
     private void Update() {
@@ -81,5 +84,14 @@ public class VehicleManager : MonoBehaviour
 
     public void SetVehicleSpawnCount(int vehicleSpawnCount) {
         this.vehicleSpawnCount = vehicleSpawnCount;
+    }
+
+    public float GetTimeScale() {
+        return timeScale;
+    }
+
+    public void SetTimeScale(float timeScale) {
+        this.timeScale = timeScale;
+        Time.timeScale = timeScale;
     }
 }

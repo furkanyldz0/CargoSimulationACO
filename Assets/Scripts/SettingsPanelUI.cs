@@ -1,5 +1,7 @@
 using DG.Tweening;
+using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -27,14 +29,31 @@ public class SettingsPanelUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI vehicleSpawnCountText;
     private int vehicleSpawnCount;
 
+    [Header("TimeScale Bölümü")]
+    [SerializeField] private Slider timeScaleSlider;
+    [SerializeField] private TextMeshProUGUI timeScaleText;
+    private float timeScale;
+
+    [Header("PheromoneTrail Bölümü")]
+    [SerializeField] private Toggle pheromoneTrailToggle;
+
     private float windowAnimationSpeed = .6f;
+    private Tween panelTween;
 
     private bool isPanelOpened;
+
+    private List<LineRenderer> allPheromoneTrails = new List<LineRenderer>();
 
     private void Start() {
         GetInitialSettings();
 
         vehicleSpawnCountSlider.interactable = false;
+
+        List<Road> allRoads = GraphManager.Instance.GetAllRoads();
+        foreach (Road road in allRoads) {
+            LineRenderer lineRenderer = road.GetComponentInChildren<LineRenderer>();
+            allPheromoneTrails.Add(lineRenderer); 
+        }
     }
 
     private void GetInitialSettings() {
@@ -53,6 +72,13 @@ public class SettingsPanelUI : MonoBehaviour
         vehicleSpawnCountSlider.SetValueWithoutNotify(vehicleSpawnCount);
         vehicleSpawnCountText.text = vehicleSpawnCount.ToString();
 
+        //timeScale
+        timeScale = VehicleManager.Instance.GetTimeScale();
+        timeScaleSlider.SetValueWithoutNotify(timeScale / 0.25f);
+        timeScaleText.text = timeScale.ToString() + "x";
+
+        //pheromoneTrailToggle
+        pheromoneTrailToggle.isOn = true;
     }
 
     public void HandleWindowButton() {
@@ -62,30 +88,43 @@ public class SettingsPanelUI : MonoBehaviour
             ShowSettingsPanel();
     }
 
-    public void ShowSettingsPanel() {
-        settingsButton.enabled = false;
+    public void HandlePheromoneTrailToggle() {
+        if (pheromoneTrailToggle.isOn)
+            ShowPheromoneTrails();
+        else
+            HidePheromoneTrails();
+    }
 
-        transform.DOMoveY(activePositionTransform.position.y, windowAnimationSpeed)
-            .SetEase(Ease.OutQuart)
-            .OnComplete(() => {
-                settingsButton.enabled = true;
-            });
+    private void ShowSettingsPanel() {
+        //settingsButton.enabled = false;
+
+        panelTween?.Kill(); //tween null deðilse, yani hala oynuyorsa zorla kesecek
 
         settingsPanel.gameObject.SetActive(true);
         isPanelOpened = true;
+
+        panelTween = transform.DOMoveY(activePositionTransform.position.y, windowAnimationSpeed)
+            .SetEase(Ease.OutQuart)
+            .OnComplete(() => {
+                //settingsButton.enabled = true;
+            });
     }
 
-    public void HideSettingsPanel() {
-        settingsButton.enabled = false;
+    private void HideSettingsPanel() {
+        //settingsButton.enabled = false;
 
-        transform.DOMoveY(disabledPositionTransform.position.y, windowAnimationSpeed)
+        panelTween?.Kill();
+
+        isPanelOpened = false;
+
+        panelTween = transform.DOMoveY(disabledPositionTransform.position.y, windowAnimationSpeed)
             .SetEase(Ease.OutQuart)
             .OnComplete(() => {
                 settingsPanel.gameObject.SetActive(false);
-                settingsButton.enabled = true;
+                //settingsButton.enabled = true;
             });
 
-        isPanelOpened = false;
+        
     }
 
     public void UpdateVehicleSpawnTime() {
@@ -107,6 +146,25 @@ public class SettingsPanelUI : MonoBehaviour
         vehicleSpawnCountText.text = vehicleSpawnCount.ToString();
 
         VehicleManager.Instance.SetVehicleSpawnCount(vehicleSpawnCount);
+    }
+
+    public void UpdateTimeScale() {
+        timeScale = timeScaleSlider.value * 0.25f;
+        timeScaleText.text = timeScale.ToString("F2") + "x";
+
+        VehicleManager.Instance.SetTimeScale(timeScale);
+    }
+
+    private void ShowPheromoneTrails() {
+        foreach (var lineRenderer in allPheromoneTrails) {
+            lineRenderer.gameObject.SetActive(true);
+        }
+    }
+
+    private void HidePheromoneTrails() {
+        foreach (var lineRenderer in allPheromoneTrails) {
+            lineRenderer.gameObject.SetActive(false);
+        }
     }
     
 }
