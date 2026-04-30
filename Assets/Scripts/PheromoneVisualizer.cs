@@ -18,17 +18,19 @@ public class PheromoneVisualizer : MonoBehaviour {
         if (lineRenderer == null) lineRenderer = GetComponent<LineRenderer>();
         if (splineContainer == null) splineContainer = GetComponentInChildren<SplineContainer>();
 
-        DrawPheromonePath();
+        DrawPheromoneTrail();
 
-        lineRenderer.startWidth = 0f;
-        lineRenderer.endWidth = 0f;
+        ResetPheromoneTrail();
     }
 
     private void Update() {
-        UpdatePheromoneVisual(road.pheromoneLevel);
+        if (!LevelManager.Instance.IsSimulationInitiated)
+            return;
+
+        UpdatePheromoneTrail(road.pheromoneLevel);
     }
 
-    private void DrawPheromonePath() {
+    private void DrawPheromoneTrail() {
         if (splineContainer == null || splineContainer.Splines.Count == 0)
             Debug.LogError(this + " için splineContainer atanmamýþ veya spline içermiyor!");
 
@@ -46,7 +48,7 @@ public class PheromoneVisualizer : MonoBehaviour {
         }
     }
 
-    public void UpdatePheromoneVisual(float currentPheromoneAmount) {
+    private void UpdatePheromoneTrail(float currentPheromoneAmount) {
         //feromon zoranýný 0 ile 1 arasýna sabitliyoruz
         float normalizedLevel = Mathf.Clamp01(currentPheromoneAmount / maxPheromoneLimitToVisualized); //öncekinde alfa deðerinde nasýl 0 ile 1 arasý sabitliyorsak burada da kalýnlýðýn yüzdeliðini hesaplýyoruz
 
@@ -58,5 +60,10 @@ public class PheromoneVisualizer : MonoBehaviour {
 
         lineRenderer.startWidth = targetWidth;
         lineRenderer.endWidth = targetWidth;
+    }
+
+    public void ResetPheromoneTrail() {
+        lineRenderer.startWidth = 0;
+        lineRenderer.endWidth = 0;
     }
 }

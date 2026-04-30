@@ -60,12 +60,12 @@ public class Vehicle : MonoBehaviour
                         if (currentWaypointIndex == waypoints.Count - 1) {
                             //mevcut waypointparentin tüm waypointleri ziyaret edildi
                             currentCity = nextCity;
-                            if(currentCity == GraphManager.Instance.targetCity) {
+                            if(currentCity == GraphManager.Instance.TargetCity) {
                                 //hedef þehre varýldý
                                 DepositPheromones();
 
                                 TravelHome();
-                                state = State.Returning; //djikstra ile eve dönecek
+                                //state = State.Returning; //djikstra ile eve dönecek
                                 cargoPackageVisual.SetActive(false);
                             }
                             else {
@@ -117,24 +117,31 @@ public class Vehicle : MonoBehaviour
         }
     }
 
-    private void TravelHome() {
+    public void TravelHome() {
         waypoints.Clear();
-        List<CitySO> path = Djikstra.FindShortestPath(currentCity, homeCity);
 
-        CitySO stepStart = currentCity; // Baþlangýcýmýz þu anki hedef þehir
-
-        foreach (CitySO stepEnd in path) {
-            Road road = GraphManager.Instance.GetRoadBetween(stepStart, stepEnd);
-            if (road != null) {
-                // O yola ait tüm waypointleri sýrayla ana listeye ekle
-                foreach (Transform child in road.waypointParent) {
-                    waypoints.Add(child);
-                }
-            }
-            stepStart = stepEnd; // Bir sonraki yolun baþlangýcý için þehri kaydýr
+        if(currentCity == homeCity) { //baþlangýçtan sonra bir þehri ziyaret edememiþse
+            Road road = GraphManager.Instance.GetRoadBetween(nextCity, homeCity);
+            foreach (Transform child in road.waypointParent) 
+                waypoints.Add(child);
         }
+        else {
+            List<CitySO> path = Djikstra.FindShortestPath(currentCity, homeCity);
+            CitySO stepStart = currentCity; // Baþlangýcýmýz þu anki hedef þehir
 
+            foreach (CitySO stepEnd in path) {
+                Road road = GraphManager.Instance.GetRoadBetween(stepStart, stepEnd);
+                if (road != null) {
+                    // O yola ait tüm waypointleri sýrayla ana listeye ekle
+                    foreach (Transform child in road.waypointParent) {
+                        waypoints.Add(child);
+                    }
+                }
+                stepStart = stepEnd; // Bir sonraki yolun baþlangýcý için þehri kaydýr
+            }
+        }
         currentWaypointIndex = -1;
+        state = State.Returning;
     }
 
     private void DepositPheromones() {
@@ -153,6 +160,10 @@ public class Vehicle : MonoBehaviour
 
     public void SetSpeed(int moveSpeed) {
         this.moveSpeed = moveSpeed;
+    }
+
+    public void SetState(State state) {
+        this.state = state;
     }
 
 }

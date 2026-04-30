@@ -31,6 +31,9 @@ public class VehicleManager : MonoBehaviour
     }
 
     private void Update() {
+        if (!LevelManager.Instance.IsSimulationInitiated)
+            return; //simülasyon levelmanager'da baþlatýlmadýðý sürece buranýn update'i çalýþmayacak
+
         if(spawnTimeDelta > 0) {
             spawnTimeDelta -= Time.deltaTime;
         }
@@ -53,11 +56,27 @@ public class VehicleManager : MonoBehaviour
         Instantiate(vehiclePrefab, transform.position, Quaternion.identity);
     }
 
+    public void SendAllVehiclesToHome() {
+        currentAllVehicles = GetAllVehiclesInScene(); //performans açýsýndan sýkýntý yaratýr mý acaba
+        foreach (Vehicle vehicle in currentAllVehicles) {
+            vehicle.TravelHome();
+        }
+    }
+
+    public void ResetCurrentVehicleCount() {
+        currentVehicleCount = 0;
+    }
+
     private void ChangeAllVehicleSpeeds(int vehicleSpeed) {
-        currentAllVehicles = FindObjectsByType<Vehicle>(FindObjectsSortMode.None).ToList(); //performans açýsýndan sýkýntý yaratýr mý acaba
+        currentAllVehicles = GetAllVehiclesInScene(); //performans açýsýndan sýkýntý yaratýr mý acaba
         foreach (Vehicle vehicle in currentAllVehicles) {
             vehicle.SetSpeed(vehicleSpeed);
         }
+    }
+
+    public List<Vehicle> GetAllVehiclesInScene() {
+        currentAllVehicles = FindObjectsByType<Vehicle>(FindObjectsSortMode.None).ToList();
+        return currentAllVehicles;
     }
 
     public int GetVehicleSpeed() {
@@ -68,14 +87,23 @@ public class VehicleManager : MonoBehaviour
         this.vehicleSpeed = vehicleSpeed;
         ChangeAllVehicleSpeeds(vehicleSpeed); //sahnedeki mevcut araçlarýn da hýzlarýný güncellememiz gerekiyor
     }
+    
+    public void SetSpawnTime(float spawnTime) {
+        this.spawnTime = spawnTime;
+        spawnTimeDelta = spawnTime; //sayaç bunun üzerinden hesaplandýðýndan spawntime güncellendiðinde gecikme oluyor
+    }
 
     public float GetSpawnTime() {
         return spawnTime;
     }
 
-    public void SetSpawnTime(float spawnTime) {
-        this.spawnTime = spawnTime;
-        spawnTimeDelta = spawnTime; //sayaç bunun üzerinden hesaplandýðýndan spawntime güncellendiðinde gecikme oluyor
+    public void SetTimeScale(float timeScale) {
+        this.timeScale = timeScale;
+        Time.timeScale = timeScale;
+    }
+
+    public float GetTimeScale() {
+        return timeScale;
     }
 
     public int GetVehicleSpawnCount() {
@@ -86,12 +114,6 @@ public class VehicleManager : MonoBehaviour
         this.vehicleSpawnCount = vehicleSpawnCount;
     }
 
-    public float GetTimeScale() {
-        return timeScale;
-    }
+    
 
-    public void SetTimeScale(float timeScale) {
-        this.timeScale = timeScale;
-        Time.timeScale = timeScale;
-    }
 }

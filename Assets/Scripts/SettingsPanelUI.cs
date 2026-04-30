@@ -47,12 +47,10 @@ public class SettingsPanelUI : MonoBehaviour
     private void Start() {
         GetInitialSettings();
 
-        vehicleSpawnCountSlider.interactable = false;
-
         List<Road> allRoads = GraphManager.Instance.GetAllRoads();
         foreach (Road road in allRoads) {
             LineRenderer lineRenderer = road.GetComponentInChildren<LineRenderer>();
-            allPheromoneTrails.Add(lineRenderer); 
+            allPheromoneTrails.Add(lineRenderer);
         }
     }
 
@@ -123,8 +121,6 @@ public class SettingsPanelUI : MonoBehaviour
                 settingsPanel.gameObject.SetActive(false);
                 //settingsButton.enabled = true;
             });
-
-        
     }
 
     public void UpdateVehicleSpawnTime() {
@@ -154,17 +150,16 @@ public class SettingsPanelUI : MonoBehaviour
 
         VehicleManager.Instance.SetTimeScale(timeScale);
     }
-
-    private void ShowPheromoneTrails() {
+    public void ShowPheromoneTrails() {
         foreach (var lineRenderer in allPheromoneTrails) {
             lineRenderer.gameObject.SetActive(true);
         }
     }
 
-    private void HidePheromoneTrails() {
+    public void HidePheromoneTrails() {
         foreach (var lineRenderer in allPheromoneTrails) {
             lineRenderer.gameObject.SetActive(false);
         }
     }
-    
+
 }

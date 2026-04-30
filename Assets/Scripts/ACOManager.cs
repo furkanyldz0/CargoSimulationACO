@@ -24,19 +24,18 @@ public class ACOManager : MonoBehaviour {
             Debug.LogError("Sahnede birden fazla ACOManager var!");
         }
         Instance = this;
+
+        allRoads = GraphManager.Instance.GetAllRoads();
     }
 
     private void Start() {
-        allRoads = GraphManager.Instance.GetAllRoads();
-
-        foreach(Road road in allRoads) {
-            road.pheromoneLevel = startPheremoneLevel;
-        }
-
         Debug.Log("ACO feromonun önemi: " + alpha + " - Yolun önemi: " + beta);
     }
 
     private void Update() {
+        if (!LevelManager.Instance.IsSimulationInitiated)
+            return;
+
         // Her karede veya belirli aralýklarla tüm yollarý buharlaþtýr
         foreach (Road road in allRoads) {
             road.pheromoneLevel *= (1f - evaporationRate * Time.deltaTime);
@@ -44,6 +43,18 @@ public class ACOManager : MonoBehaviour {
             if (road.pheromoneLevel < minPheromone) {
                 road.pheromoneLevel = minPheromone;
             }
+        }
+    }
+
+    public void SetStartPheromone() {
+        foreach (Road road in allRoads) {
+            road.pheromoneLevel = startPheremoneLevel;
+        }
+    }
+
+    public void ResetStartPheromone() {
+        foreach (Road road in allRoads) {
+            road.pheromoneLevel = 0;
         }
     }
 

@@ -6,11 +6,10 @@ public class GraphManager : MonoBehaviour
 {
     public static GraphManager Instance { get; private set; }
 
-    //[SerializeField] private List<Road> allRoads; //sürekli sürükleyip býrakmamak için parent kullanacaðým
-    [SerializeField] private Transform RoadParent;
-    private List<Road> allRoads = new List<Road>();
+    public CitySO TargetCity { get; set; }
 
-    public CitySO targetCity;
+    [SerializeField] private Transform RoadParent; //tüm road'larý içeren gameobject
+    private List<Road> allRoads = new List<Road>();
 
     private void Awake() {
         if(Instance != null) {
