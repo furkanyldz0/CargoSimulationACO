@@ -52,6 +52,17 @@ public class SettingsPanelUI : MonoBehaviour
             LineRenderer lineRenderer = road.GetComponentInChildren<LineRenderer>();
             allPheromoneTrails.Add(lineRenderer);
         }
+
+        VisualManager.Instance.OnEnteredSelectionMode += Instance_OnEnteredSelectionMode;
+        VisualManager.Instance.OnExitedSelectionMode += Instance_OnExitedSelectionMode;
+    }
+
+    private void Instance_OnEnteredSelectionMode(object sender, EventArgs e) {
+        ShowSettingsPanel();
+    }
+
+    private void Instance_OnExitedSelectionMode(object sender, EventArgs e) {
+        HideSettingsPanel();
     }
 
     private void GetInitialSettings() {

@@ -24,7 +24,7 @@ public class LevelManager : MonoBehaviour //levelmanager yerine baþka isim yazab
     }
 
     public void InitiateSimulation(City targetCity) {
-        SetTargetCity(targetCity);
+        SetTargetCity(targetCity.GetCitySO());
 
         ACOManager.Instance.SetStartPheromone(); //bunu deðerler yapacaðýz, paneli daha eklemediðim için acomanager'in kendi deðerini kullanýyor
 
@@ -36,7 +36,8 @@ public class LevelManager : MonoBehaviour //levelmanager yerine baþka isim yazab
         IsSimulationInitiated = false;
         IsSelectingCity = false; //gerek yok aslýnda ama dursun
 
-        GraphManager.Instance.TargetCity = null;
+        SetTargetCity(null);
+        CitySelection.Instance.SetSelectedCity(null); //bunu baþlatma kýsmýnda da çaðrabiliriz
         VehicleManager.Instance.ResetCurrentVehicleCount();
         VehicleManager.Instance.SendAllVehiclesToHome();
         ACOManager.Instance.ResetStartPheromone();
@@ -44,8 +45,8 @@ public class LevelManager : MonoBehaviour //levelmanager yerine baþka isim yazab
         //pheromonevisualizer için de yazmaya gerek yok feromonlarý sýfýrlayýnca gidecek
     }
 
-    public void SetTargetCity(City city) {
-        GraphManager.Instance.TargetCity = city.GetCitySO();
+    public void SetTargetCity(CitySO citySO) {
+        GraphManager.Instance.TargetCity = citySO;
     }
 
     private void ResetAllPheromoneTrails() {

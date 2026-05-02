@@ -5,6 +5,7 @@ public class GameManagerUI : MonoBehaviour
 {
     [SerializeField] private Button initiateButton;
     [SerializeField] private Button selectCityButton;
+    [SerializeField] private Button cancelSelectCityButton;
     [SerializeField] private Button stopButton;
 
     [SerializeField] private Slider vehicleSpawnTimeSlider;
@@ -16,7 +17,10 @@ public class GameManagerUI : MonoBehaviour
     public void EnterSelectingCityProcess() {
         selectCityButton.gameObject.SetActive(false);
         initiateButton.gameObject.SetActive(true);
+        cancelSelectCityButton.gameObject.SetActive(true);
+
         LevelManager.Instance.EnterSelectingCityProcess();
+        VisualManager.Instance.EnterCitySelectionMode();
     }
 
     public void InitiateSimulation() {
@@ -24,10 +28,13 @@ public class GameManagerUI : MonoBehaviour
 
         if (targetCity != null) {
             LevelManager.Instance.InitiateSimulation(targetCity);
-            vehicleSpawnTimeSlider.interactable = false;
 
+            vehicleSpawnTimeSlider.interactable = false;
             initiateButton.gameObject.SetActive(false);
+            cancelSelectCityButton.gameObject.SetActive(false);
             stopButton.gameObject.SetActive(true);
+
+            VisualManager.Instance.ExitCitySelectionMode();
 
             Debug.Log("Simülasyon baþladý, hedef þehir: " + targetCity.GetCitySO().name);
         }
@@ -43,10 +50,19 @@ public class GameManagerUI : MonoBehaviour
         Debug.Log("Simülasyon durduruldu.");
     }
 
+    public void CancelSelection() {
+        LevelManager.Instance.ResetLevel();
+        VisualManager.Instance.ExitCitySelectionMode();
+        EnterIdleScreen();
+        
+        Debug.Log("Þehir seçimi iptal edildi.");
+    }
+
     public void EnterIdleScreen() {
         vehicleSpawnTimeSlider.interactable = true;
         initiateButton.gameObject.SetActive(false);
         stopButton.gameObject.SetActive(false);
         selectCityButton.gameObject.SetActive(true);
+        cancelSelectCityButton.gameObject.SetActive(false);
     }
 }
