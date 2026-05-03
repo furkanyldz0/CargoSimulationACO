@@ -82,9 +82,9 @@ public class SettingsPanelUI : MonoBehaviour
         vehicleSpawnCountText.text = vehicleSpawnCount.ToString();
 
         //timeScale
-        timeScale = VehicleManager.Instance.GetTimeScale();
+        timeScale = LevelManager.TimeScale;
         timeScaleSlider.SetValueWithoutNotify(timeScale / 0.25f);
-        timeScaleText.text = timeScale.ToString() + "x";
+        timeScaleText.text = timeScale.ToString("F2") + "x";
 
         //pheromoneTrailToggle
         pheromoneTrailToggle.isOn = true;
@@ -159,7 +159,7 @@ public class SettingsPanelUI : MonoBehaviour
         timeScale = timeScaleSlider.value * 0.25f;
         timeScaleText.text = timeScale.ToString("F2") + "x";
 
-        VehicleManager.Instance.SetTimeScale(timeScale);
+        LevelManager.SetTimeScale(timeScale);
     }
     public void ShowPheromoneTrails() {
         foreach (var lineRenderer in allPheromoneTrails) {

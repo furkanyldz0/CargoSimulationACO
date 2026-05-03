@@ -5,8 +5,9 @@ public class Vehicle : MonoBehaviour
 {
     private State state;
 
-    private int moveSpeed;
-    private float rotateSpeed = 20f;
+    private static int MoveSpeed;
+
+    private float rotateSpeed = 100f;
     private Vector3 targetRotation;
 
     private List<Transform> waypoints = new List<Transform>();
@@ -28,7 +29,7 @@ public class Vehicle : MonoBehaviour
     }
 
     private void Start() {
-        moveSpeed = VehicleManager.Instance.GetVehicleSpeed();
+        MoveSpeed = VehicleManager.Instance.GetVehicleSpeed();
         homeCity = currentCity;
         state = State.Traveling;
 
@@ -37,7 +38,6 @@ public class Vehicle : MonoBehaviour
     }
 
     private void Update() {
-        //Time.timeScale = 3; simülasyonu hýzlandýrýyor ama hýzlandýrmayý böyle yapmayacaðým
 
         switch (state) {
             case State.Idle:
@@ -47,11 +47,11 @@ public class Vehicle : MonoBehaviour
             case State.Traveling:
                 if (currentWaypointIndex < waypoints.Count - 1) {
                     transform.position = Vector3.MoveTowards(transform.position, waypoints[currentWaypointIndex + 1].position,
-                        Time.deltaTime * moveSpeed);
+                        Time.deltaTime * MoveSpeed * LevelManager.TimeScale);
 
                     targetRotation = waypoints[currentWaypointIndex + 1].position - transform.position;
                     if (targetRotation != Vector3.zero) {
-                        transform.forward = Vector3.Slerp(transform.forward, targetRotation, Time.deltaTime * rotateSpeed);
+                        transform.forward = Vector3.Slerp(transform.forward, targetRotation, Time.deltaTime * rotateSpeed * LevelManager.TimeScale);
                     }
 
                     if (transform.position == waypoints[currentWaypointIndex + 1].position) {
@@ -79,11 +79,11 @@ public class Vehicle : MonoBehaviour
             case State.Returning:
                 if (currentWaypointIndex < waypoints.Count - 1) {
                     transform.position = Vector3.MoveTowards(transform.position, waypoints[currentWaypointIndex + 1].position,
-                        Time.deltaTime * moveSpeed);
+                        Time.deltaTime * MoveSpeed * LevelManager.TimeScale);
 
                     targetRotation = waypoints[currentWaypointIndex + 1].position - transform.position;
                     if (targetRotation != Vector3.zero) {
-                        transform.forward = Vector3.Slerp(transform.forward, targetRotation, Time.deltaTime * rotateSpeed);
+                        transform.forward = Vector3.Slerp(transform.forward, targetRotation, Time.deltaTime * rotateSpeed * LevelManager.TimeScale);
                     }
 
                     if (transform.position == waypoints[currentWaypointIndex + 1].position) {
@@ -118,30 +118,32 @@ public class Vehicle : MonoBehaviour
     }
 
     public void TravelHome() {
-        waypoints.Clear();
+        if(state != State.Returning) { //bunu koymazsam dýþarýdan çaðýrdýðýmda uçarak targetcity'e dönüyorlar
+            waypoints.Clear();
 
-        if(currentCity == homeCity) { //baþlangýçtan sonra bir þehri ziyaret edememiþse
-            Road road = GraphManager.Instance.GetRoadBetween(nextCity, homeCity);
-            foreach (Transform child in road.waypointParent) 
-                waypoints.Add(child);
-        }
-        else {
-            List<CitySO> path = Djikstra.FindShortestPath(currentCity, homeCity);
-            CitySO stepStart = currentCity; // Baþlangýcýmýz þu anki hedef þehir
-
-            foreach (CitySO stepEnd in path) {
-                Road road = GraphManager.Instance.GetRoadBetween(stepStart, stepEnd);
-                if (road != null) {
-                    // O yola ait tüm waypointleri sýrayla ana listeye ekle
-                    foreach (Transform child in road.waypointParent) {
-                        waypoints.Add(child);
-                    }
-                }
-                stepStart = stepEnd; // Bir sonraki yolun baþlangýcý için þehri kaydýr
+            if (currentCity == homeCity) { //baþlangýçtan sonra bir þehri ziyaret edememiþse
+                Road road = GraphManager.Instance.GetRoadBetween(nextCity, homeCity);
+                foreach (Transform child in road.waypointParent)
+                    waypoints.Add(child);
             }
+            else {
+                List<CitySO> path = Djikstra.FindShortestPath(currentCity, homeCity);
+                CitySO stepStart = currentCity; // Baþlangýcýmýz þu anki hedef þehir
+
+                foreach (CitySO stepEnd in path) {
+                    Road road = GraphManager.Instance.GetRoadBetween(stepStart, stepEnd);
+                    if (road != null) {
+                        // O yola ait tüm waypointleri sýrayla ana listeye ekle
+                        foreach (Transform child in road.waypointParent) {
+                            waypoints.Add(child);
+                        }
+                    }
+                    stepStart = stepEnd; // Bir sonraki yolun baþlangýcý için þehri kaydýr
+                }
+            }
+            currentWaypointIndex = -1;
+            state = State.Returning;
         }
-        currentWaypointIndex = -1;
-        state = State.Returning;
     }
 
     private void DepositPheromones() {
@@ -158,8 +160,8 @@ public class Vehicle : MonoBehaviour
         }
     }
 
-    public void SetSpeed(int moveSpeed) {
-        this.moveSpeed = moveSpeed;
+    public static void SetSpeed(int moveSpeed) {
+        MoveSpeed = moveSpeed;
     }
 
     public void SetState(State state) {

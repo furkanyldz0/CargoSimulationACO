@@ -38,7 +38,7 @@ public class ACOManager : MonoBehaviour {
 
         // Her karede veya belirli aralýklarla tüm yollarý buharlaþtýr
         foreach (Road road in allRoads) {
-            road.pheromoneLevel *= (1f - evaporationRate * Time.deltaTime);
+            road.pheromoneLevel *= (1f - evaporationRate * Time.deltaTime * LevelManager.TimeScale);
 
             if (road.pheromoneLevel < minPheromone) {
                 road.pheromoneLevel = minPheromone;

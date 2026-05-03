@@ -13,11 +13,13 @@ public class VehicleManager : MonoBehaviour
     [SerializeField] private int vehicleSpeed = 40;
     [SerializeField] private float spawnTime = 1f;
     [SerializeField] private int vehicleSpawnCount;
-    [SerializeField] private float timeScale = 1;
+
+    private int currentVehicleCount = 0;
+    private bool isMaximumVehicleCountReached;
 
     private List<Vehicle> currentAllVehicles = new List<Vehicle>();
-    private int currentVehicleCount = 0;
     private float spawnTimeDelta;
+    
 
     private void Awake() {
         if(Instance != null) {
@@ -26,23 +28,20 @@ public class VehicleManager : MonoBehaviour
         Instance = this;
     }
 
-    private void Start() {
-        SetTimeScale(1f);
-    }
 
     private void Update() {
-        if (!LevelManager.Instance.IsSimulationInitiated)
+        if (!LevelManager.Instance.IsSimulationInitiated || isMaximumVehicleCountReached)
             return; //simülasyon levelmanager'da baþlatýlmadýðý sürece buranýn update'i çalýþmayacak
 
         if(spawnTimeDelta > 0) {
-            spawnTimeDelta -= Time.deltaTime;
+            spawnTimeDelta -= Time.deltaTime * LevelManager.TimeScale;
         }
 
         if(spawnTimeDelta <= 0) {
             if(currentVehicleCount >= vehicleSpawnCount) {
                 Debug.Log("Maksimum araç limitine ulaþýldý: " + vehicleSpawnCount
                     + ", spawner devre dýþý býrakýlýyor...");
-                enabled = false;
+                isMaximumVehicleCountReached = true;
             }
             else {
                 GenerateVehicle();
@@ -63,16 +62,17 @@ public class VehicleManager : MonoBehaviour
         }
     }
 
-    public void ResetCurrentVehicleCount() {
+    public void ResetVariables() {
         currentVehicleCount = 0;
+        isMaximumVehicleCountReached = false;
     }
 
-    private void ChangeAllVehicleSpeeds(int vehicleSpeed) {
-        currentAllVehicles = GetAllVehiclesInScene(); //performans açýsýndan sýkýntý yaratýr mý acaba
-        foreach (Vehicle vehicle in currentAllVehicles) {
-            vehicle.SetSpeed(vehicleSpeed);
-        }
-    }
+    //private void ChangeAllVehicleSpeeds(int vehicleSpeed) {
+    //    currentAllVehicles = GetAllVehiclesInScene(); //performans açýsýndan sýkýntý yaratýr mý acaba
+    //    foreach (Vehicle vehicle in currentAllVehicles) {
+    //        vehicle.SetSpeed(vehicleSpeed);
+    //    }
+    //} tüm araçlar ayný hýzla gideceði için speedi static yapmaya karar verdim, ayný hýzla gitsin istersem güncellenebilir
 
     public List<Vehicle> GetAllVehiclesInScene() {
         currentAllVehicles = FindObjectsByType<Vehicle>(FindObjectsSortMode.None).ToList();
@@ -85,25 +85,18 @@ public class VehicleManager : MonoBehaviour
 
     public void SetVehicleSpeed(int vehicleSpeed) {
         this.vehicleSpeed = vehicleSpeed;
-        ChangeAllVehicleSpeeds(vehicleSpeed); //sahnedeki mevcut araçlarýn da hýzlarýný güncellememiz gerekiyor
-    }
-    
-    public void SetSpawnTime(float spawnTime) {
-        this.spawnTime = spawnTime;
-        spawnTimeDelta = spawnTime; //sayaç bunun üzerinden hesaplandýðýndan spawntime güncellendiðinde gecikme oluyor
+        Vehicle.SetSpeed(vehicleSpeed);
+
+        //ChangeAllVehicleSpeeds(vehicleSpeed); //sahnedeki mevcut araçlarýn da hýzlarýný güncellememiz gerekiyor
     }
 
     public float GetSpawnTime() {
         return spawnTime;
     }
 
-    public void SetTimeScale(float timeScale) {
-        this.timeScale = timeScale;
-        Time.timeScale = timeScale;
-    }
-
-    public float GetTimeScale() {
-        return timeScale;
+    public void SetSpawnTime(float spawnTime) {
+        this.spawnTime = spawnTime;
+        spawnTimeDelta = spawnTime; //sayaç bunun üzerinden hesaplandýðýndan spawntime güncellendiðinde gecikme oluyor
     }
 
     public int GetVehicleSpawnCount() {
@@ -114,6 +107,5 @@ public class VehicleManager : MonoBehaviour
         this.vehicleSpawnCount = vehicleSpawnCount;
     }
 
-    
 
 }

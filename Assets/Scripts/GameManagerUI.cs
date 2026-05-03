@@ -14,15 +14,6 @@ public class GameManagerUI : MonoBehaviour
         EnterIdleScreen();
     }
 
-    public void EnterSelectingCityProcess() {
-        selectCityButton.gameObject.SetActive(false);
-        initiateButton.gameObject.SetActive(true);
-        cancelSelectCityButton.gameObject.SetActive(true);
-
-        LevelManager.Instance.EnterSelectingCityProcess();
-        VisualManager.Instance.EnterCitySelectionMode();
-    }
-
     public void InitiateSimulation() {
         City targetCity = CitySelection.Instance.GetSelectedCity();
 
@@ -48,6 +39,15 @@ public class GameManagerUI : MonoBehaviour
         EnterIdleScreen();
 
         Debug.Log("Simülasyon durduruldu.");
+    }
+
+    public void EnterSelectingCityProcess() {
+        LevelManager.Instance.EnterSelectingCityProcess();
+        VisualManager.Instance.EnterCitySelectionMode();
+
+        selectCityButton.gameObject.SetActive(false);
+        initiateButton.gameObject.SetActive(true);
+        cancelSelectCityButton.gameObject.SetActive(true);
     }
 
     public void CancelSelection() {

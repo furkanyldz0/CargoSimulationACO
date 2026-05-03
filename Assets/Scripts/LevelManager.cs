@@ -5,8 +5,11 @@ public class LevelManager : MonoBehaviour //levelmanager yerine baþka isim yazab
 {
     public static LevelManager Instance { get; private set; }
 
+    public static float TimeScale { get; private set; } = 1f;
+
     public bool IsSimulationInitiated { get; private set; }
     public bool IsSelectingCity { get; private set; }
+
 
     private void Awake() {
         if (Instance != null)
@@ -38,7 +41,7 @@ public class LevelManager : MonoBehaviour //levelmanager yerine baþka isim yazab
 
         SetTargetCity(null);
         CitySelection.Instance.SetSelectedCity(null); //bunu baþlatma kýsmýnda da çaðrabiliriz
-        VehicleManager.Instance.ResetCurrentVehicleCount();
+        VehicleManager.Instance.ResetVariables();
         VehicleManager.Instance.SendAllVehiclesToHome();
         ACOManager.Instance.ResetStartPheromone();
         ResetAllPheromoneTrails();
@@ -54,5 +57,9 @@ public class LevelManager : MonoBehaviour //levelmanager yerine baþka isim yazab
         foreach (Road road in roads) {
             road.GetComponent<PheromoneVisualizer>().ResetPheromoneTrail();
         }
+    }
+
+    public static void SetTimeScale(float timeScale) {
+        TimeScale = timeScale;
     }
 }
