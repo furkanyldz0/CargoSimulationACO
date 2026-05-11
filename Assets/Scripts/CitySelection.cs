@@ -27,8 +27,13 @@ public class CitySelection : MonoBehaviour
         if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject()) { //yeni input system ile güncellenecek
             if (Physics.Raycast(ray, out RaycastHit raycastHit, 3000, cityLayer)) {
                 if (raycastHit.transform.TryGetComponent(out City city)) {
-                    SetSelectedCity(city);
-                    Debug.Log(city.GetCitySO().name);
+                    if(IsValidToSelect(city)) {
+                        SetSelectedCity(city);
+                        Debug.Log(city.GetCitySO().name);
+                    }
+                    else {
+                        Debug.Log("Hedef þehir baþlangýç þehir ile ayný olamaz!");
+                    }
                 }
             }
         }
@@ -42,5 +47,9 @@ public class CitySelection : MonoBehaviour
 
     public City GetSelectedCity() {
         return selectedCity;
+    }
+
+    public bool IsValidToSelect(City targetCity) {
+        return targetCity.GetCitySO() != GraphManager.Instance.StartCitySO;
     }
 }

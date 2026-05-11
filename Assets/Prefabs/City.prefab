@@ -365,7 +365,7 @@ GameObject:
   - component: {fileID: 5668159345042561367}
   - component: {fileID: 5793371730402776075}
   - component: {fileID: 7969295296498232188}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: DefaultVisual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -768,7 +768,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3908718374110614774}
   - component: {fileID: 6720128415164605512}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: CityVisual
   m_TagString: Untagged
   m_Icon: {fileID: 0}

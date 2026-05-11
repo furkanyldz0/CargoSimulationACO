@@ -17,8 +17,7 @@ public class Vehicle : MonoBehaviour
     private List<Road> traveledRoads = new List<Road>(); //feromon eklenmesi için
     private List<CitySO> visitedCities = new List<CitySO>(); //önceki þehirlere tekrar gitmemesi için
 
-    [SerializeField] private CitySO currentCity;
-    private CitySO homeCity, nextCity;
+    private CitySO homeCity, currentCity, nextCity;
 
     [SerializeField] private GameObject cargoPackageVisual;
 
@@ -30,7 +29,9 @@ public class Vehicle : MonoBehaviour
 
     private void Start() {
         MoveSpeed = VehicleManager.Instance.GetVehicleSpeed();
-        homeCity = currentCity;
+        homeCity = GraphManager.Instance.StartCitySO;
+        currentCity = homeCity;
+
         state = State.Traveling;
 
         if (!visitedCities.Contains(currentCity)) visitedCities.Add(currentCity);
@@ -60,7 +61,7 @@ public class Vehicle : MonoBehaviour
                         if (currentWaypointIndex == waypoints.Count - 1) {
                             //mevcut waypointparentin tüm waypointleri ziyaret edildi
                             currentCity = nextCity;
-                            if(currentCity == GraphManager.Instance.TargetCity) {
+                            if(currentCity == GraphManager.Instance.TargetCitySO) {
                                 //hedef þehre varýldý
                                 DepositPheromones();
 

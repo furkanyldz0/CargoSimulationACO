@@ -10,6 +10,8 @@ public class LevelManager : MonoBehaviour //levelmanager yerine baþka isim yazab
     public bool IsSimulationInitiated { get; private set; }
     public bool IsSelectingCity { get; private set; }
 
+    [SerializeField] City startCity; //bunu cityselection ile alacaðýz ama ileride
+
 
     private void Awake() {
         if (Instance != null)
@@ -27,7 +29,7 @@ public class LevelManager : MonoBehaviour //levelmanager yerine baþka isim yazab
     }
 
     public void InitiateSimulation(City targetCity) {
-        SetTargetCity(targetCity.GetCitySO());
+        GraphManager.Instance.SetTargetCity(targetCity.GetCitySO());
 
         ACOManager.Instance.SetStartPheromone(); //bunu deðerler yapacaðýz, paneli daha eklemediðim için acomanager'in kendi deðerini kullanýyor
 
@@ -39,17 +41,18 @@ public class LevelManager : MonoBehaviour //levelmanager yerine baþka isim yazab
         IsSimulationInitiated = false;
         IsSelectingCity = false; //gerek yok aslýnda ama dursun
 
-        SetTargetCity(null);
+        GraphManager.Instance.SetTargetCity(null);
+        GraphManager.Instance.SetStartCity(null);
+
         CitySelection.Instance.SetSelectedCity(null); //bunu baþlatma kýsmýnda da çaðrabiliriz
+
         VehicleManager.Instance.ResetVariables();
         VehicleManager.Instance.SendAllVehiclesToHome();
+
         ACOManager.Instance.ResetStartPheromone();
         ResetAllPheromoneTrails();
-        //pheromonevisualizer için de yazmaya gerek yok feromonlarý sýfýrlayýnca gidecek
-    }
 
-    public void SetTargetCity(CitySO citySO) {
-        GraphManager.Instance.TargetCity = citySO;
+        DesignateStartCity(startCity); //yukarýda dediðim gibi seçerek alacaðýz ileride
     }
 
     private void ResetAllPheromoneTrails() {
@@ -61,5 +64,12 @@ public class LevelManager : MonoBehaviour //levelmanager yerine baþka isim yazab
 
     public static void SetTimeScale(float timeScale) {
         TimeScale = timeScale;
+    }
+
+    public void DesignateStartCity(City startCity) {
+        CitySO citySO = startCity.GetCitySO();
+        GraphManager.Instance.SetStartCity(citySO);
+        VehicleManager.Instance.transform.position = CityPool.Instance.GetCityForCitySO(citySO).transform.position;
+        Debug.Log("Baþlangýç þehri: " + startCity);
     }
 }

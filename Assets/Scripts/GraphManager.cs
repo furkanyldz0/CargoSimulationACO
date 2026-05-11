@@ -6,7 +6,8 @@ public class GraphManager : MonoBehaviour
 {
     public static GraphManager Instance { get; private set; }
 
-    public CitySO TargetCity { get; set; }
+    public CitySO TargetCitySO { get; private set; }
+    public CitySO StartCitySO { get; private set; }
 
     [SerializeField] private Transform RoadParent; //tüm road'larý içeren gameobject
     private List<Road> allRoads = new List<Road>();
@@ -34,4 +35,11 @@ public class GraphManager : MonoBehaviour
         return allRoads;
     }
 
+    public void SetTargetCity(CitySO citySO) {
+        TargetCitySO = citySO;
+    }
+
+    public void SetStartCity(CitySO citySO) {
+        StartCitySO = citySO;
+    }
 }

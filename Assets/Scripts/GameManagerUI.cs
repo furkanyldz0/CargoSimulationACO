@@ -30,7 +30,7 @@ public class GameManagerUI : MonoBehaviour
             Debug.Log("Simülasyon baþladý, hedef þehir: " + targetCity.GetCitySO().name);
         }
         else {
-            Debug.Log("Þehir seçiniz!");
+            Debug.Log("Þehir seçilmedi ya da seçilen þehir baþlangýç þehir ile ayný!");
         }
     }
 
