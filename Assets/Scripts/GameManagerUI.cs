@@ -4,50 +4,42 @@ using UnityEngine.UI;
 public class GameManagerUI : MonoBehaviour
 {
     [SerializeField] private Button initiateButton;
-    [SerializeField] private Button selectCityButton;
+    [SerializeField] private Button selectStartCityButton;
+    [SerializeField] private Button selectTargetCityButton;
     [SerializeField] private Button cancelSelectCityButton;
     [SerializeField] private Button stopButton;
 
     [SerializeField] private Slider vehicleSpawnTimeSlider;
+    [SerializeField] private Slider startPheromoneLevelSlider;
 
     private void Start() {
         EnterIdleScreen();
     }
 
-    public void InitiateSimulation() {
-        City targetCity = CitySelection.Instance.GetSelectedCity();
+    public void EnterSelectingStartCityProcess() {
+        LevelManager.Instance.EnterSelectingCityProcess();
+        VisualManager.Instance.EnterStartCitySelectionMode();
 
-        if (targetCity != null) {
-            LevelManager.Instance.InitiateSimulation(targetCity);
+        selectStartCityButton.gameObject.SetActive(false);
+        selectTargetCityButton.gameObject.SetActive(true);
+        cancelSelectCityButton.gameObject.SetActive(true);
+    }
 
-            vehicleSpawnTimeSlider.interactable = false;
-            initiateButton.gameObject.SetActive(false);
-            cancelSelectCityButton.gameObject.SetActive(false);
-            stopButton.gameObject.SetActive(true);
+    public void EnterSelectingTargetCityProcess() {
+        City startCity = CitySelection.Instance.GetSelectedCity();
 
-            VisualManager.Instance.ExitCitySelectionMode();
-
-            Debug.Log("Simülasyon baþladý, hedef þehir: " + targetCity.GetCitySO().name);
+        if(startCity != null) {
+            LevelManager.Instance.ExitSelectingStartCityProcess(startCity);
+            VisualManager.Instance.EnterTargetCitySelectionMode();
+            selectTargetCityButton.gameObject.SetActive(false);
+            initiateButton.gameObject.SetActive(true);
         }
         else {
-            Debug.Log("Þehir seçilmedi ya da seçilen þehir baþlangýç þehir ile ayný!");
+            string notificationText = "Baþlangýç þehri seçiniz!";
+            NotificationManagerUI.Instance.Notificate(notificationText);
+            Debug.Log(notificationText);
         }
-    }
-
-    public void StopSimulation() {
-        LevelManager.Instance.ResetLevel();
-        EnterIdleScreen();
-
-        Debug.Log("Simülasyon durduruldu.");
-    }
-
-    public void EnterSelectingCityProcess() {
-        LevelManager.Instance.EnterSelectingCityProcess();
-        VisualManager.Instance.EnterCitySelectionMode();
-
-        selectCityButton.gameObject.SetActive(false);
-        initiateButton.gameObject.SetActive(true);
-        cancelSelectCityButton.gameObject.SetActive(true);
+        
     }
 
     public void CancelSelection() {
@@ -58,11 +50,43 @@ public class GameManagerUI : MonoBehaviour
         Debug.Log("Þehir seçimi iptal edildi.");
     }
 
+    public void InitiateSimulation() {
+        City targetCity = CitySelection.Instance.GetSelectedCity();
+
+        if (targetCity != null) {
+            LevelManager.Instance.InitiateSimulation(targetCity);
+
+            vehicleSpawnTimeSlider.interactable = false;
+            startPheromoneLevelSlider.interactable = false;
+            initiateButton.gameObject.SetActive(false);
+            cancelSelectCityButton.gameObject.SetActive(false);
+            stopButton.gameObject.SetActive(true);
+
+            VisualManager.Instance.ExitCitySelectionMode();
+
+            Debug.Log("Simülasyon baþladý, hedef þehir: " + targetCity.GetCitySO().name);
+        }
+        else if(targetCity == null){
+            string notificationText = "Hedef þehir seçiniz!";
+            NotificationManagerUI.Instance.Notificate(notificationText);
+            Debug.Log(notificationText);
+        }
+    }
+
+    public void StopSimulation() {
+        LevelManager.Instance.ResetLevel();
+        EnterIdleScreen();
+
+        Debug.Log("Simülasyon durduruldu.");
+    }
+
     public void EnterIdleScreen() {
         vehicleSpawnTimeSlider.interactable = true;
+        startPheromoneLevelSlider.interactable = true;
         initiateButton.gameObject.SetActive(false);
         stopButton.gameObject.SetActive(false);
-        selectCityButton.gameObject.SetActive(true);
+        selectTargetCityButton.gameObject.SetActive(false);
         cancelSelectCityButton.gameObject.SetActive(false);
+        selectStartCityButton.gameObject.SetActive(true);
     }
 }

@@ -9,8 +9,7 @@ public class LevelManager : MonoBehaviour //levelmanager yerine baþka isim yazab
 
     public bool IsSimulationInitiated { get; private set; }
     public bool IsSelectingCity { get; private set; }
-
-    [SerializeField] City startCity; //bunu cityselection ile alacaðýz ama ileride
+    public bool IsSelectingStartCity { get; private set; }
 
 
     private void Awake() {
@@ -25,13 +24,21 @@ public class LevelManager : MonoBehaviour //levelmanager yerine baþka isim yazab
     }
 
     public void EnterSelectingCityProcess() {
-        Instance.IsSelectingCity = true;
+        IsSelectingCity = true;
+        IsSelectingStartCity = true;
+    }
+
+    public void ExitSelectingStartCityProcess(City startCity) {
+        IsSelectingStartCity = false;
+
+        DesignateStartCity(startCity);
+        CitySelection.Instance.SetSelectedCity(null);
     }
 
     public void InitiateSimulation(City targetCity) {
         GraphManager.Instance.SetTargetCity(targetCity.GetCitySO());
 
-        ACOManager.Instance.SetStartPheromone(); //bunu deðerler yapacaðýz, paneli daha eklemediðim için acomanager'in kendi deðerini kullanýyor
+        ACOManager.Instance.AddStartPheromone(); //bunu deðerler yapacaðýz, paneli daha eklemediðim için acomanager'in kendi deðerini kullanýyor
 
         IsSimulationInitiated = true;
         IsSelectingCity = false;
@@ -40,9 +47,10 @@ public class LevelManager : MonoBehaviour //levelmanager yerine baþka isim yazab
     public void ResetLevel() { //en baþtaki durum
         IsSimulationInitiated = false;
         IsSelectingCity = false; //gerek yok aslýnda ama dursun
+        IsSelectingStartCity = false;
 
         GraphManager.Instance.SetTargetCity(null);
-        GraphManager.Instance.SetStartCity(null);
+        GraphManager.Instance.SetStartCity(null); 
 
         CitySelection.Instance.SetSelectedCity(null); //bunu baþlatma kýsmýnda da çaðrabiliriz
 
@@ -51,8 +59,6 @@ public class LevelManager : MonoBehaviour //levelmanager yerine baþka isim yazab
 
         ACOManager.Instance.ResetStartPheromone();
         ResetAllPheromoneTrails();
-
-        DesignateStartCity(startCity); //yukarýda dediðim gibi seçerek alacaðýz ileride
     }
 
     private void ResetAllPheromoneTrails() {
@@ -68,8 +74,10 @@ public class LevelManager : MonoBehaviour //levelmanager yerine baþka isim yazab
 
     public void DesignateStartCity(City startCity) {
         CitySO citySO = startCity.GetCitySO();
+
         GraphManager.Instance.SetStartCity(citySO);
         VehicleManager.Instance.transform.position = CityPool.Instance.GetCityForCitySO(citySO).transform.position;
+        
         Debug.Log("Baþlangýç þehri: " + startCity);
     }
 }

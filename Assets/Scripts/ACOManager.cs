@@ -12,10 +12,10 @@ public class ACOManager : MonoBehaviour {
     [Header("Yollar için feromon özellikleri")]
     [SerializeField] private float startPheremoneLevel = 1f;
     [SerializeField] private float evaporationRate = 0.05f; // Buharlaþma hýzý (0 ile 1 arasý)
-    [SerializeField] private float minPheromone = 0.1f;    // Feromonun tamamen yok olmamasý için alt sýnýr
+    [SerializeField] private float minPheromoneLevel = 0.1f;    // Feromonun tamamen yok olmamasý için alt sýnýr
 
     [Header("Q sabit deðeri (Býrakýlan feromon: Q / L^2)")]
-    [SerializeField] private float Q = 10000f;
+    [SerializeField] private int Q = 10000;
 
     private List<Road> allRoads;
 
@@ -40,13 +40,13 @@ public class ACOManager : MonoBehaviour {
         foreach (Road road in allRoads) {
             road.pheromoneLevel *= (1f - evaporationRate * Time.deltaTime * LevelManager.TimeScale);
 
-            if (road.pheromoneLevel < minPheromone) {
-                road.pheromoneLevel = minPheromone;
+            if (road.pheromoneLevel < minPheromoneLevel) {
+                road.pheromoneLevel = minPheromoneLevel;
             }
         }
     }
 
-    public void SetStartPheromone() {
+    public void AddStartPheromone() {
         foreach (Road road in allRoads) {
             road.pheromoneLevel = startPheremoneLevel;
         }
@@ -121,5 +121,47 @@ public class ACOManager : MonoBehaviour {
             r.pheromoneLevel += pheromoneToAdd;
         }
 
+    }
+
+    public float GetAlpha() {
+        return alpha;
+    }
+    public void SetAlpha(float alpha) {
+        this.alpha = alpha;
+    }
+
+    public float GetBeta() {
+        return beta;
+    }
+    public void SetBeta(float beta) {
+        this.beta = beta;
+    }
+
+    public float GetStartPheromoneLevel() {
+        return startPheremoneLevel;
+    }
+    public void SetStartPheromoneLevel(float startPheremoneLevel) {
+        this.startPheremoneLevel = startPheremoneLevel;
+    }
+
+    public float GetEvaporationRate() {
+        return evaporationRate;
+    }
+    public void SetEvaporationRate(float evaporationRate) {
+        this.evaporationRate = Mathf.Clamp01(evaporationRate);
+    }
+
+    public float GetMinPheromoneLevel() {
+        return minPheromoneLevel;
+    }
+    public void SetMinPheromoneLevel(float minPheromone) {
+        this.minPheromoneLevel = Mathf.Max(0.0001f, minPheromone);
+    }
+
+    public int GetQ() {
+        return Q;
+    }
+    public void SetQ(int Q) {
+        this.Q = Q;
     }
 }

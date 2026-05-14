@@ -21,10 +21,12 @@ public class CitySelection : MonoBehaviour
         if (!LevelManager.Instance.IsSelectingCity)
             return; //þehir seçmiyorsa bu scriptin update'i çalýþmasýn
 
-        Vector3 raycastPosition = Input.mousePosition;
-        Ray ray = Camera.main.ScreenPointToRay(raycastPosition); //
+
 
         if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject()) { //yeni input system ile güncellenecek
+            Vector3 raycastPosition = Input.mousePosition;
+            Ray ray = Camera.main.ScreenPointToRay(raycastPosition);
+
             if (Physics.Raycast(ray, out RaycastHit raycastHit, 3000, cityLayer)) {
                 if (raycastHit.transform.TryGetComponent(out City city)) {
                     if(IsValidToSelect(city)) {
@@ -32,7 +34,9 @@ public class CitySelection : MonoBehaviour
                         Debug.Log(city.GetCitySO().name);
                     }
                     else {
-                        Debug.Log("Hedef þehir baþlangýç þehir ile ayný olamaz!");
+                        string notificationText = "Hedef þehir ile baþlangýç þehri ayný olamaz!";
+                        NotificationManagerUI.Instance.Notificate(notificationText);
+                        Debug.Log(notificationText);
                     }
                 }
             }
@@ -41,15 +45,16 @@ public class CitySelection : MonoBehaviour
 
     public void SetSelectedCity(City city) {
         selectedCity = city;
-        if(city != null)
-            VisualManager.Instance.SelectCity(selectedCity);
+        if(selectedCity != null) {
+            VisualManager.Instance.SelectCity(city);
+        }
     }
 
     public City GetSelectedCity() {
         return selectedCity;
     }
 
-    public bool IsValidToSelect(City targetCity) {
+    private bool IsValidToSelect(City targetCity) {
         return targetCity.GetCitySO() != GraphManager.Instance.StartCitySO;
     }
 }
