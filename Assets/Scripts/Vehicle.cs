@@ -108,7 +108,8 @@ public class Vehicle : MonoBehaviour
         if (nextCity != null) {
             Road road = GraphManager.Instance.GetRoadBetween(currentCity, nextCity);
 
-            if (!traveledRoads.Contains(road)) traveledRoads.Add(road);
+            // if (!traveledRoads.Contains(road)) ping pong yaptýðýnda cezalandýrmasý için 
+            traveledRoads.Add(road);
 
             if (!visitedCities.Contains(nextCity)) visitedCities.Add(nextCity);
 

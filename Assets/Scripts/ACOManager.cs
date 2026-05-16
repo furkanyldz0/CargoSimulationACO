@@ -88,7 +88,10 @@ public class ACOManager : MonoBehaviour {
                 float score = tau * eta;
 
                 scores.Add(score);
-                totalScore += score;
+                totalScore += score; //standart aco formülündeki toplam skora bölme iþlemiyle olasýlýk bulma hesabýný
+                //yapmadýk, çünkü halihazýrda rulet tekerleði ile gidilecek yolu hesapladýðýmýz için
+                //bu bölme iþlemi yapýlsa da rulet dilimlerinin büyüklüðü, yüzdelikleri ayný olacak.
+                //ayrýca sahnedeki yüzlerce araç için bölme iþlemini gerçekleþtirmeyerek performanstan da kazanç saðlýyoruz
             }
         }
 
@@ -113,9 +116,11 @@ public class ACOManager : MonoBehaviour {
             totalDistance += r.distance;
         }
 
-        // 2. Yol ne kadar kýsaysa o kadar çok feromon býrak (Q / L formülü)
-        // Q sabit bir deðerdir (örn: 100)
-        float pheromoneToAdd = Q / (totalDistance * totalDistance);
+        // 2. Yol ne kadar kýsaysa o kadar çok feromon býrak (Q / L^2 formülü) //þehirler arasýndaki yollarýn
+        // uzunluðu birbirine oldukça yakýn olduðu için standart formülde birkaç kmlik kýsa olan yol araçlarý
+        // o yola yönlendirmeye ikna edecek kadar fazla feromon salgýlamayabilir, o yüzden förmülü kýyasla uzun
+        // yollar seçildiðinde daha cezelandýrýcý bir þekilde az feromon býrakmasý þeklinde güncelledik
+        float pheromoneToAdd = Q / (totalDistance * totalDistance); 
 
         foreach (Road r in traveledRoads) {
             r.pheromoneLevel += pheromoneToAdd;
