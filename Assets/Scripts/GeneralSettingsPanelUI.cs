@@ -10,7 +10,6 @@ public class SettingsPanelUI : MonoBehaviour
 {
     [Header("Panel Ayarlarý")]
     [SerializeField] private Transform settingsPanel;
-    [SerializeField] private Button settingsButton;
     [SerializeField] private Transform activePositionTransform;
     [SerializeField] private Transform disabledPositionTransform;
 
@@ -105,8 +104,6 @@ public class SettingsPanelUI : MonoBehaviour
     }
 
     private void ShowSettingsPanel() {
-        //settingsButton.enabled = false;
-
         panelTween?.Kill(); //tween null deðilse, yani hala oynuyorsa zorla kesecek
 
         settingsPanel.gameObject.SetActive(true);
@@ -115,13 +112,10 @@ public class SettingsPanelUI : MonoBehaviour
         panelTween = transform.DOMoveY(activePositionTransform.position.y, windowAnimationSpeed)
             .SetEase(Ease.OutQuart)
             .OnComplete(() => {
-                //settingsButton.enabled = true;
             });
     }
 
     private void HideSettingsPanel() {
-        //settingsButton.enabled = false;
-
         panelTween?.Kill();
 
         isPanelOpened = false;
@@ -130,7 +124,6 @@ public class SettingsPanelUI : MonoBehaviour
             .SetEase(Ease.OutQuart)
             .OnComplete(() => {
                 settingsPanel.gameObject.SetActive(false);
-                //settingsButton.enabled = true;
             });
     }
 

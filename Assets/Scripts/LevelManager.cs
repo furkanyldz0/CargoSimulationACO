@@ -1,9 +1,13 @@
+ï»¿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LevelManager : MonoBehaviour //levelmanager yerine başka isim yazabilirim
+public class LevelManager : MonoBehaviour //levelmanager yerine baÅŸka isim yazabilirim
 {
     public static LevelManager Instance { get; private set; }
+
+    public event EventHandler OnSimulationStarted;
+    public event EventHandler OnSimulationStopped;
 
     public static float TimeScale { get; private set; } = 1f;
 
@@ -38,27 +42,37 @@ public class LevelManager : MonoBehaviour //levelmanager yerine başka isim yazab
     public void InitiateSimulation(City targetCity) {
         GraphManager.Instance.SetTargetCity(targetCity.GetCitySO());
 
-        ACOManager.Instance.AddStartPheromone(); //bunu değerler yapacağız, paneli daha eklemediğim için acomanager'in kendi değerini kullanıyor
+        ACOManager.Instance.AddStartPheromone(); //bunu deÄŸerler yapacaÄŸÄ±z, paneli daha eklemediÄŸim iÃ§in acomanager'in kendi deÄŸerini kullanÄ±yor
 
         IsSimulationInitiated = true;
         IsSelectingCity = false;
+
+        Djikstra.CacheStartToTargetPath();   // â† Ã–NCE cache (StartCitySO ve TargetCitySO ikisi de set edilmiÅŸ olmalÄ±)
+        StatsManager.Instance.StartRun();
+
+        OnSimulationStarted?.Invoke(this, EventArgs.Empty);
     }
 
-    public void ResetLevel() { //en baştaki durum
+    public void ResetLevel() { //en baÅŸtaki durum
         IsSimulationInitiated = false;
-        IsSelectingCity = false; //gerek yok aslında ama dursun
+        IsSelectingCity = false; //gerek yok aslÄ±nda ama dursun
         IsSelectingStartCity = false;
+
+        StatsManager.Instance.StopRun();
+        Djikstra.ClearCache();
 
         GraphManager.Instance.SetTargetCity(null);
         GraphManager.Instance.SetStartCity(null); 
 
-        CitySelection.Instance.SetSelectedCity(null); //bunu başlatma kısmında da çağrabiliriz
+        CitySelection.Instance.SetSelectedCity(null); //bunu baÅŸlatma kÄ±smÄ±nda da Ã§aÄŸrabiliriz
 
         VehicleManager.Instance.ResetVariables();
         VehicleManager.Instance.SendAllVehiclesToHome();
 
         ACOManager.Instance.ResetStartPheromone();
         ResetAllPheromoneTrails();
+
+        OnSimulationStopped?.Invoke(this, EventArgs.Empty);
     }
 
     private void ResetAllPheromoneTrails() {
@@ -78,6 +92,6 @@ public class LevelManager : MonoBehaviour //levelmanager yerine başka isim yazab
         GraphManager.Instance.SetStartCity(citySO);
         VehicleManager.Instance.transform.position = CityPool.Instance.GetCityForCitySO(citySO).transform.position;
         
-        Debug.Log("Başlangıç şehri: " + startCity);
+        Debug.Log("BaÅŸlangÄ±Ã§ ÅŸehri: " + startCity);
     }
 }

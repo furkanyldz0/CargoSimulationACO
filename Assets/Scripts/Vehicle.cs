@@ -65,7 +65,7 @@ public class Vehicle : MonoBehaviour
                                 //hedef þehre varýldý
                                 DepositPheromones();
 
-                                TravelHome();
+                                TravelHome(false);
                                 //state = State.Returning; //djikstra ile eve dönecek
                                 cargoPackageVisual.SetActive(false);
                             }
@@ -119,7 +119,7 @@ public class Vehicle : MonoBehaviour
         }
     }
 
-    public void TravelHome() {
+    public void TravelHome(bool isForceReturn) {
         if(state != State.Returning) { //bunu koymazsam dýþarýdan çaðýrdýðýmda uçarak targetcity'e dönüyorlar
             waypoints.Clear();
 
@@ -129,7 +129,13 @@ public class Vehicle : MonoBehaviour
                     waypoints.Add(child);
             }
             else {
-                List<CitySO> path = Djikstra.FindShortestPath(currentCity, homeCity);
+                List<CitySO> path = null;
+                if (!isForceReturn && Djikstra.CachedStartToTargetPath != null)
+                    path = Djikstra.GetCachedReturnPath();
+                else
+                    path = Djikstra.FindShortestPath(currentCity, homeCity);
+                
+
                 CitySO stepStart = currentCity; // Baþlangýcýmýz þu anki hedef þehir
 
                 foreach (CitySO stepEnd in path) {
@@ -149,6 +155,16 @@ public class Vehicle : MonoBehaviour
     }
 
     private void DepositPheromones() {
+        // Stats için ACO yol verilerini hazýrla ve bildir
+        List<CitySO> acoPath = new List<CitySO> { homeCity };
+        float acoLength = 0f;
+        foreach (Road r in traveledRoads) {
+            acoPath.Add(r.endCitySO);
+            acoLength += r.distance;
+        }
+        StatsManager.Instance.RegisterDelivery(acoPath, acoLength);
+
+        // Mevcut feromon ekleme mantýðý
         ACOManager.Instance.AddPheromones(traveledRoads);
 
         traveledRoads.Clear();

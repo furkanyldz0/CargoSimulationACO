@@ -1,14 +1,63 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 
 public static class Djikstra
 {
+    // Run boyunca sabit kalan baÅŸlangÄ±Ã§â†’hedef rotasÄ±nÄ±n cache'i
+    public static List<CitySO> CachedStartToTargetPath { get; private set; }
+    private static List<CitySO> CachedReturnPath;
+    public static float CachedStartToTargetLength { get; private set; }
+
+    public static void CacheStartToTargetPath() {
+        CitySO start = GraphManager.Instance.StartCitySO;
+        CitySO target = GraphManager.Instance.TargetCitySO;
+
+        CachedStartToTargetPath = FindShortestPath(start, target);
+
+        // FindShortestPath baÅŸlangÄ±Ã§ ÅŸehrini path'e dahil etmiyor, ekleyelim
+        if (CachedStartToTargetPath.Count == 0 || CachedStartToTargetPath[0] != start) {
+            CachedStartToTargetPath.Insert(0, start);
+        }
+
+        CachedStartToTargetLength = CalculatePathLength(CachedStartToTargetPath);
+
+        Debug.Log($"[Djikstra] Cache hazÄ±r: {string.Join("->", CachedStartToTargetPath.ConvertAll(c => c.cityName))} | Uzunluk: {CachedStartToTargetLength:F2}");
+    }
+
+    public static List<CitySO> GetCachedReturnPath() {
+        if (CachedStartToTargetPath == null) return null;
+
+        if(CachedReturnPath == null) {
+            List<CitySO> reversed = new List<CitySO>(CachedStartToTargetPath);
+            reversed.Reverse();         // [target, c2, c1, start]
+            reversed.RemoveAt(0);       // [c2, c1, start] â€” currentCity'yi Ã§Ä±kar
+            CachedReturnPath = reversed;
+        }
+
+        return CachedReturnPath;
+    }
+
+    public static void ClearCache() {
+        CachedStartToTargetPath = null;
+        CachedReturnPath = null;
+        CachedStartToTargetLength = 0f;
+    }
+
+    public static float CalculatePathLength(List<CitySO> path) {
+        float total = 0;
+        for (int i = 0; i < path.Count - 1; i++) {
+            Road r = GraphManager.Instance.GetRoadBetween(path[i], path[i + 1]);
+            if (r != null) total += r.distance;
+        }
+        return total;
+    }
+
     public static List<CitySO> FindShortestPath(CitySO startCity, CitySO endCity) {
         Dictionary<CitySO, float> distances = new Dictionary<CitySO, float>();
         Dictionary<CitySO, CitySO> previousNodes = new Dictionary<CitySO, CitySO>();
         List<CitySO> unvisited = new List<CitySO>();
 
-        // 1. Tüm þehirleri topla ve mesafeleri sonsuz yap
+        // 1. TÃ¼m ÅŸehirleri topla ve mesafeleri sonsuz yap
         foreach (Road road in GraphManager.Instance.GetAllRoads()) {
             if (!unvisited.Contains(road.startCitySO)) unvisited.Add(road.startCitySO);
             if (!unvisited.Contains(road.endCitySO)) unvisited.Add(road.endCitySO);
@@ -17,12 +66,12 @@ public static class Djikstra
             distances[city] = float.MaxValue;
         }
 
-        // Baþlangýç noktasýnýn mesafesi 0'dýr
+        // BaÅŸlangÄ±Ã§ noktasÄ±nÄ±n mesafesi 0'dÄ±r
         distances[startCity] = 0f;
 
-        // 2. Ana Döngü
+        // 2. Ana DÃ¶ngÃ¼
         while (unvisited.Count > 0) {
-            // Ziyaret edilmemiþler arasýndan en kýsa mesafeli þehri bul
+            // Ziyaret edilmemiÅŸler arasÄ±ndan en kÄ±sa mesafeli ÅŸehri bul
             CitySO current = unvisited[0];
             foreach (CitySO city in unvisited) {
                 if (distances[city] < distances[current]) {
@@ -32,10 +81,10 @@ public static class Djikstra
 
             unvisited.Remove(current);
 
-            // Hedefe ulaþtýysak aramayý bitir
+            // Hedefe ulaÅŸtÄ±ysak aramayÄ± bitir
             if (current == endCity) break;
 
-            // Komþularýn mesafelerini güncelle
+            // KomÅŸularÄ±n mesafelerini gÃ¼ncelle
             foreach (CitySO neighbor in current.neighbors) {
                 if (!unvisited.Contains(neighbor)) continue;
 
@@ -44,13 +93,13 @@ public static class Djikstra
                     float alt = distances[current] + road.distance;
                     if (alt < distances[neighbor]) {
                         distances[neighbor] = alt;
-                        previousNodes[neighbor] = current; // Nereden geldiðimizi kaydet
+                        previousNodes[neighbor] = current; // Nereden geldiÄŸimizi kaydet
                     }
                 }
             }
         }
 
-        // 3. Rotayý Geriye Doðru Çiz
+        // 3. RotayÄ± Geriye DoÄŸru Ã‡iz
         List<CitySO> path = new List<CitySO>();
         CitySO step = endCity;
 
@@ -59,7 +108,7 @@ public static class Djikstra
             step = previousNodes[step];
         }
 
-        path.Reverse(); // Listeyi baþtan sona doðru çevir
+        path.Reverse(); // Listeyi baÅŸtan sona doÄŸru Ã§evir
         return path;
     }
 }

@@ -58,7 +58,7 @@ public class VehicleManager : MonoBehaviour
     public void SendAllVehiclesToHome() {
         currentAllVehicles = GetAllVehiclesInScene(); //performans açýsýndan sýkýntý yaratýr mý acaba
         foreach (Vehicle vehicle in currentAllVehicles) {
-            vehicle.TravelHome();
+            vehicle.TravelHome(true);
         }
     }
 
