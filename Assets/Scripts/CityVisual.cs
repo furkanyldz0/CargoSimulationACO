@@ -16,6 +16,13 @@ public class CityVisual : MonoBehaviour
         VisualManager.Instance.OnSelectedStartCity += Instance_OnSelectedStartCity;
     }
 
+    private void OnDestroy() {
+        VisualManager.Instance.OnEnteredSelectionMode -= Instance_OnEnteredSelectionMode;
+        VisualManager.Instance.OnExitedSelectionMode -= Instance_OnExitedSelectionMode;
+        VisualManager.Instance.OnSelectedTargetCity -= Instance_OnSelectedTargetCity;
+        VisualManager.Instance.OnSelectedStartCity -= Instance_OnSelectedStartCity;
+    }
+
     private void Instance_OnSelectedStartCity(object sender, VisualManager.OnSelectedCityEventArgs e) {
         if (e.city == city) {
             SelectAsStart();

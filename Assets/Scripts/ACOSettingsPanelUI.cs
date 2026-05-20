@@ -55,6 +55,10 @@ public class ACOSettingsPanelUI : MonoBehaviour
         HideACOSettingsPanel();
     }
 
+    private void OnDestroy() {
+        VisualManager.Instance.OnExitedSelectionMode -= Instance_OnExitedSelectionMode;
+    }
+
     private void Instance_OnExitedSelectionMode(object sender, System.EventArgs e) {
         HideACOSettingsPanel();
     }

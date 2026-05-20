@@ -54,8 +54,8 @@ public class StatsManager : MonoBehaviour {
         recentRatios.Clear();
 
         // Dijkstra cache'inden referans değerleri al
-        dijkstraPath = Djikstra.CachedStartToTargetPath;
-        dijkstraLength = Djikstra.CachedStartToTargetLength;
+        dijkstraPath = Dijkstra.CachedStartToTargetPath;
+        dijkstraLength = Dijkstra.CachedStartToTargetLength;
 
         isRunActive = true;
 

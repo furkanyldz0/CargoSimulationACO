@@ -34,6 +34,12 @@ public class StatsPanelUI : MonoBehaviour {
         StatsManager.Instance.OnStatsUpdated += StatsManager_OnStatsUpdated;
     }
 
+    private void OnDestroy() {
+        LevelManager.Instance.OnSimulationStarted -= LevelManager_OnSimulationStarted;
+        LevelManager.Instance.OnSimulationStopped -= LevelManager_OnSimulationStopped;
+        StatsManager.Instance.OnStatsUpdated -= StatsManager_OnStatsUpdated;
+    }
+
     private void LevelManager_OnSimulationStarted(object sender, System.EventArgs e) {
         statsButton.SetActive(true);
         RefreshLabels(); // başlangıç verileri (Dijkstra hazır, henüz teslimat yok)
@@ -99,7 +105,7 @@ public class StatsPanelUI : MonoBehaviour {
         // ACO yakınsadığı (pheromone-dominant)
         var dominantPath = StatsManager.Instance.ComputeDominantPath();
         if (dominantPath != null && dominantPath.Count > 1 && dominantPath[dominantPath.Count - 1] == GraphManager.Instance.TargetCitySO) {
-            float dominantLen = Djikstra.CalculatePathLength(dominantPath);
+            float dominantLen = Dijkstra.CalculatePathLength(dominantPath);
             dominantInfoText.text = $"{PathToString(dominantPath)}\nUzunluk: {dominantLen:F2} km";
         } else {
             dominantInfoText.text = "-"; //henüz yakınsama yok

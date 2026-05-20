@@ -1,6 +1,5 @@
 using System;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -10,12 +9,16 @@ public class VisualManager : MonoBehaviour
 
     public event EventHandler OnEnteredSelectionMode;
     public event EventHandler OnExitedSelectionMode;
-
     public event EventHandler<OnSelectedCityEventArgs> OnSelectedTargetCity;
     public event EventHandler<OnSelectedCityEventArgs> OnSelectedStartCity;
+    public event EventHandler<OnPheromoneTrailsVisibilityChangedEventArgs> OnPheromoneTrailsVisibilityChanged;
 
     public class OnSelectedCityEventArgs : EventArgs {
         public City city;
+    }
+
+    public class OnPheromoneTrailsVisibilityChangedEventArgs : EventArgs {
+        public bool isEnabled;
     }
 
     [SerializeField] private Volume selectionFilterVolume;
@@ -96,6 +99,14 @@ public class VisualManager : MonoBehaviour
     private void DisableSelectionFilter() {
         selectionFilterVolume.weight = 0f;
     }
+
+    public void HandlePheromoneTrailsVisibility(bool isEnabled) {
+        OnPheromoneTrailsVisibilityChanged?.Invoke(this, new OnPheromoneTrailsVisibilityChangedEventArgs {
+            isEnabled = isEnabled
+        });
+    }
+
     
+
 
 }

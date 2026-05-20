@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public static class Djikstra
+public static class Dijkstra
 {
     // Run boyunca sabit kalan başlangıç→hedef rotasının cache'i
     public static List<CitySO> CachedStartToTargetPath { get; private set; }

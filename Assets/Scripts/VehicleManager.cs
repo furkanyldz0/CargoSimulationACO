@@ -67,13 +67,6 @@ public class VehicleManager : MonoBehaviour
         isMaximumVehicleCountReached = false;
     }
 
-    //private void ChangeAllVehicleSpeeds(int vehicleSpeed) {
-    //    currentAllVehicles = GetAllVehiclesInScene(); //performans açýsýndan sýkýntý yaratýr mý acaba
-    //    foreach (Vehicle vehicle in currentAllVehicles) {
-    //        vehicle.SetSpeed(vehicleSpeed);
-    //    }
-    //} tüm araçlar ayný hýzla gideceði için speedi static yapmaya karar verdim, ayný hýzla gitsin istersem güncellenebilir
-
     public List<Vehicle> GetAllVehiclesInScene() {
         currentAllVehicles = FindObjectsByType<Vehicle>(FindObjectsSortMode.None).ToList();
         return currentAllVehicles;
@@ -86,8 +79,6 @@ public class VehicleManager : MonoBehaviour
     public void SetVehicleSpeed(int vehicleSpeed) {
         this.vehicleSpeed = vehicleSpeed;
         Vehicle.SetSpeed(vehicleSpeed);
-
-        //ChangeAllVehicleSpeeds(vehicleSpeed); //sahnedeki mevcut araçlarýn da hýzlarýný güncellememiz gerekiyor
     }
 
     public float GetSpawnTime() {

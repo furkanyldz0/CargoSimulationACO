@@ -26,7 +26,7 @@ public class NotificationManagerUI : MonoBehaviour
             .DOMove(tweenTopEndPositionTransform.position, 2f)
             .SetEase(Ease.OutCirc);
 
-        mySequence = mySequence = DOTween.Sequence();
+        mySequence = DOTween.Sequence();
         mySequence.SetAutoKill(false);
 
         mySequence.Append(textTween)

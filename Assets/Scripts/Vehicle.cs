@@ -39,64 +39,69 @@ public class Vehicle : MonoBehaviour
     }
 
     private void Update() {
-
         switch (state) {
             case State.Idle:
                 //Debug.Log("Araç boþta...");
                 break;
 
             case State.Traveling:
-                if (currentWaypointIndex < waypoints.Count - 1) {
-                    transform.position = Vector3.MoveTowards(transform.position, waypoints[currentWaypointIndex + 1].position,
-                        Time.deltaTime * MoveSpeed * LevelManager.TimeScale);
-
-                    targetRotation = waypoints[currentWaypointIndex + 1].position - transform.position;
-                    if (targetRotation != Vector3.zero) {
-                        transform.forward = Vector3.Slerp(transform.forward, targetRotation, Time.deltaTime * rotateSpeed * LevelManager.TimeScale);
-                    }
-
-                    if (transform.position == waypoints[currentWaypointIndex + 1].position) {
-                        currentWaypointIndex++;
-
-                        if (currentWaypointIndex == waypoints.Count - 1) {
-                            //mevcut waypointparentin tüm waypointleri ziyaret edildi
-                            currentCity = nextCity;
-                            if(currentCity == GraphManager.Instance.TargetCitySO) {
-                                //hedef þehre varýldý
-                                DepositPheromones();
-
-                                TravelHome(false);
-                                //state = State.Returning; //djikstra ile eve dönecek
-                                cargoPackageVisual.SetActive(false);
-                            }
-                            else {
-                                TravelNextCity();
-                            }                       
-                        }  
-                    }
-                }
+                HandleTraveling();
                 break;
 
             case State.Returning:
-                if (currentWaypointIndex < waypoints.Count - 1) {
-                    transform.position = Vector3.MoveTowards(transform.position, waypoints[currentWaypointIndex + 1].position,
-                        Time.deltaTime * MoveSpeed * LevelManager.TimeScale);
+                HandleReturning();
+                break;
+        }
+    }
 
-                    targetRotation = waypoints[currentWaypointIndex + 1].position - transform.position;
-                    if (targetRotation != Vector3.zero) {
-                        transform.forward = Vector3.Slerp(transform.forward, targetRotation, Time.deltaTime * rotateSpeed * LevelManager.TimeScale);
+    private void MoveToNextWaypoint() {
+        transform.position = Vector3.MoveTowards(transform.position, waypoints[currentWaypointIndex + 1].position,
+            Time.deltaTime * MoveSpeed * LevelManager.TimeScale);
+
+        targetRotation = waypoints[currentWaypointIndex + 1].position - transform.position;
+        if (targetRotation != Vector3.zero) {
+            transform.forward = Vector3.Slerp(transform.forward, targetRotation, Time.deltaTime * rotateSpeed * LevelManager.TimeScale);
+        }
+    }
+
+    private void HandleTraveling() {
+        if (currentWaypointIndex < waypoints.Count - 1) {
+            MoveToNextWaypoint();
+
+            if (transform.position == waypoints[currentWaypointIndex + 1].position) {
+                currentWaypointIndex++;
+
+                if (currentWaypointIndex == waypoints.Count - 1) {
+                    //mevcut waypointparentin tüm waypointleri ziyaret edildi
+                    currentCity = nextCity;
+                    if (currentCity == GraphManager.Instance.TargetCitySO) {
+                        //hedef þehre varýldý
+                        DepositPheromones();
+
+                        TravelHome(false);
+                        //state = State.Returning; //djikstra ile eve dönecek
+                        cargoPackageVisual.SetActive(false);
                     }
-
-                    if (transform.position == waypoints[currentWaypointIndex + 1].position) {
-                        currentWaypointIndex++;
-
-                        if (currentWaypointIndex == waypoints.Count - 1) {
-                            //araç eve vardý
-                            Destroy(gameObject);
-                        }
+                    else {
+                        TravelNextCity();
                     }
                 }
-                break;
+            }
+        }
+    }
+
+    private void HandleReturning() {
+        if (currentWaypointIndex < waypoints.Count - 1) {
+            MoveToNextWaypoint();
+
+            if (transform.position == waypoints[currentWaypointIndex + 1].position) {
+                currentWaypointIndex++;
+
+                if (currentWaypointIndex == waypoints.Count - 1) {
+                    //araç eve vardý
+                    Destroy(gameObject);
+                }
+            }
         }
     }
 
@@ -130,10 +135,10 @@ public class Vehicle : MonoBehaviour
             }
             else {
                 List<CitySO> path = null;
-                if (!isForceReturn && Djikstra.CachedStartToTargetPath != null)
-                    path = Djikstra.GetCachedReturnPath();
+                if (!isForceReturn && Dijkstra.CachedStartToTargetPath != null)
+                    path = Dijkstra.GetCachedReturnPath();
                 else
-                    path = Djikstra.FindShortestPath(currentCity, homeCity);
+                    path = Dijkstra.FindShortestPath(currentCity, homeCity);
                 
 
                 CitySO stepStart = currentCity; // Baþlangýcýmýz þu anki hedef þehir

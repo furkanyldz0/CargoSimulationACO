@@ -1,12 +1,11 @@
 using DG.Tweening;
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SettingsPanelUI : MonoBehaviour
+public class GeneralSettingsPanelUI : MonoBehaviour
 {
     [Header("Panel Ayarlarý")]
     [SerializeField] private Transform settingsPanel;
@@ -41,19 +40,15 @@ public class SettingsPanelUI : MonoBehaviour
 
     private bool isPanelOpened;
 
-    private List<LineRenderer> allPheromoneTrails = new List<LineRenderer>();
-
     private void Start() {
         GetInitialSettings();
-
-        List<Road> allRoads = GraphManager.Instance.GetAllRoads();
-        foreach (Road road in allRoads) {
-            LineRenderer lineRenderer = road.GetComponentInChildren<LineRenderer>();
-            allPheromoneTrails.Add(lineRenderer);
-        }
-
         VisualManager.Instance.OnEnteredSelectionMode += Instance_OnEnteredSelectionMode;
         VisualManager.Instance.OnExitedSelectionMode += Instance_OnExitedSelectionMode;
+    }
+
+    private void OnDestroy() {
+        VisualManager.Instance.OnEnteredSelectionMode -= Instance_OnEnteredSelectionMode;
+        VisualManager.Instance.OnExitedSelectionMode -= Instance_OnExitedSelectionMode;
     }
 
     private void Instance_OnEnteredSelectionMode(object sender, EventArgs e) {
@@ -97,10 +92,7 @@ public class SettingsPanelUI : MonoBehaviour
     }
 
     public void HandlePheromoneTrailToggle() {
-        if (pheromoneTrailToggle.isOn)
-            ShowPheromoneTrails();
-        else
-            HidePheromoneTrails();
+        VisualManager.Instance.HandlePheromoneTrailsVisibility(pheromoneTrailToggle.isOn);
     }
 
     private void ShowSettingsPanel() {
@@ -153,17 +145,6 @@ public class SettingsPanelUI : MonoBehaviour
         timeScaleText.text = timeScale.ToString("F2") + "x";
 
         LevelManager.SetTimeScale(timeScale);
-    }
-    public void ShowPheromoneTrails() {
-        foreach (var lineRenderer in allPheromoneTrails) {
-            lineRenderer.gameObject.SetActive(true);
-        }
-    }
-
-    public void HidePheromoneTrails() {
-        foreach (var lineRenderer in allPheromoneTrails) {
-            lineRenderer.gameObject.SetActive(false);
-        }
     }
 
 }

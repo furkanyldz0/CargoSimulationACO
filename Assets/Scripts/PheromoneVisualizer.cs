@@ -19,8 +19,20 @@ public class PheromoneVisualizer : MonoBehaviour {
         if (splineContainer == null) splineContainer = GetComponentInChildren<SplineContainer>();
 
         DrawPheromoneTrail();
-
         ResetPheromoneTrail();
+
+        VisualManager.Instance.OnPheromoneTrailsVisibilityChanged += Instance_OnPheromoneTrailsVisibilityChanged;
+    }
+
+    private void OnDestroy() {
+        VisualManager.Instance.OnPheromoneTrailsVisibilityChanged -= Instance_OnPheromoneTrailsVisibilityChanged;
+    }
+
+    private void Instance_OnPheromoneTrailsVisibilityChanged(object sender, VisualManager.OnPheromoneTrailsVisibilityChangedEventArgs e) {
+        if (e.isEnabled)
+            lineRenderer.gameObject.SetActive(true);
+        else
+            lineRenderer.gameObject.SetActive(false);
     }
 
     private void Update() {

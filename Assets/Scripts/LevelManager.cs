@@ -42,12 +42,12 @@ public class LevelManager : MonoBehaviour //levelmanager yerine başka isim yaza
     public void InitiateSimulation(City targetCity) {
         GraphManager.Instance.SetTargetCity(targetCity.GetCitySO());
 
-        ACOManager.Instance.AddStartPheromone(); //bunu değerler yapacağız, paneli daha eklemediğim için acomanager'in kendi değerini kullanıyor
+        ACOManager.Instance.AddStartPheromone();
 
         IsSimulationInitiated = true;
         IsSelectingCity = false;
 
-        Djikstra.CacheStartToTargetPath();   // ← ÖNCE cache (StartCitySO ve TargetCitySO ikisi de set edilmiş olmalı)
+        Dijkstra.CacheStartToTargetPath();   // ← ÖNCE cache (StartCitySO ve TargetCitySO ikisi de set edilmiş olmalı)
         StatsManager.Instance.StartRun();
 
         OnSimulationStarted?.Invoke(this, EventArgs.Empty);
@@ -59,7 +59,7 @@ public class LevelManager : MonoBehaviour //levelmanager yerine başka isim yaza
         IsSelectingStartCity = false;
 
         StatsManager.Instance.StopRun();
-        Djikstra.ClearCache();
+        Dijkstra.ClearCache();
 
         GraphManager.Instance.SetTargetCity(null);
         GraphManager.Instance.SetStartCity(null); 
