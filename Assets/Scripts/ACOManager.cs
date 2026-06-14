@@ -6,19 +6,20 @@ public class ACOManager : MonoBehaviour {
     public static ACOManager Instance { get; private set; }
 
     [Header("Alpha: Feromonun önemi - Beta: Mesafenin önemi")]
-    [SerializeField] private float alpha = 1.0f; // Feromonun önemi
-    [SerializeField] private float beta = 1.0f;  // Mesafenin önemi (Mesafe kýsa olunca çekicilik artar)
+    [SerializeField] private float alpha = 1.0f; //Feromona verilen önem
+    [SerializeField] private float beta = 1.0f;  //Mesafeye verilen önem
 
     [Header("Yollar için feromon özellikleri")]
-    [SerializeField] private float startPheremoneLevel = 1f;
-    [SerializeField] private float evaporationRate = 0.05f; // Buharlaþma hýzý (0 ile 1 arasý)
-    [SerializeField] private float minPheromoneLevel = 0.1f;    // Feromonun tamamen yok olmamasý için alt sýnýr
+    [SerializeField] private float startPheremoneLevel = 1f; //Yollardaki baþlagýç feromon miktarý
+    [SerializeField] private float evaporationRate = 0.05f; //Buharlaþma hýzý (0 ile 1 arasý)
+    [SerializeField] private float minPheromoneLevel = 0.1f; //Feromonun yok olmamasý için minimum sýnýr
 
     [Header("Q sabit deðeri (Býrakýlan feromon: Q / L^2)")]
-    [SerializeField] private int Q = 10000;
+    [SerializeField] private int Q = 10000; //Q sabiti
 
-    private List<Road> allRoads;
+    private List<Road> allRoads; //Sahne üzerindeki tüm yollar, bilgileri graphmanager'dan alacak
 
+    //Awake metodu start'dan önce çalýþýr, ACOManager nesnesi önceden oluþturulduðu için sahne baþlar baþlamaz çaðrýlýr
     private void Awake() {
         if(Instance != null) {
             Debug.LogError("Sahnede birden fazla ACOManager var!");
@@ -36,7 +37,7 @@ public class ACOManager : MonoBehaviour {
         if (!LevelManager.Instance.IsSimulationInitiated)
             return;
 
-        // Her karede veya belirli aralýklarla tüm yollarý buharlaþtýr
+        //Her karede tüm yollardaki feromonu buharlaþtýrýr
         foreach (Road road in allRoads) {
             road.pheromoneLevel *= (1f - evaporationRate * Time.deltaTime * LevelManager.TimeScale);
 
@@ -60,8 +61,7 @@ public class ACOManager : MonoBehaviour {
 
     public CitySO ChooseNextCity(CitySO currentCity, List<CitySO> visitedCities) {
 
-        // 2. Sadece daha önce gidilmemiþ komþularý filtrele
-        List<CitySO> availableNeighbors = new List<CitySO>();
+        List<CitySO> availableNeighbors = new List<CitySO>(); //Daha önce gidilmemiþ komþularý tanýmlar
 
         foreach (CitySO neighbor in currentCity.neighbors) {
             if (!visitedCities.Contains(neighbor)) {
@@ -69,33 +69,34 @@ public class ACOManager : MonoBehaviour {
             }
         }
 
-        // 3. Eðer gidilecek yeni yer kalmadýysa (çýkmaz sokak), 
-        // ping-pong yapmamak için rastgele bir komþuya dön
+        //Eðer ziyaret edilmemiþ þehir kalmadýysa rastgele seçer
         if (availableNeighbors.Count == 0) {
             return currentCity.neighbors[Random.Range(0, currentCity.neighbors.Count)];
         }
 
-        // 4. Olasýlýk Hesaplama (Sadece gidilebilir komþular için)
+        //Mevcut komþular için olasýlýk hesaplar
         List<float> scores = new List<float>();
         float totalScore = 0f;
 
         foreach (CitySO neighbor in availableNeighbors) {
             Road road = GraphManager.Instance.GetRoadBetween(currentCity, neighbor);
             if (road != null) {
-                // Formül: P = (Feromon^alpha) * ((1/Mesafe)^beta)
+                //Formül: P = (Feromon^alpha) * ((1/Mesafe)^beta)
                 float tau = Mathf.Pow(road.pheromoneLevel, alpha);
                 float eta = Mathf.Pow(1f / road.distance, beta);
                 float score = tau * eta;
 
                 scores.Add(score);
-                totalScore += score; //standart aco formülündeki toplam skora bölme iþlemiyle olasýlýk bulma hesabýný
+                totalScore += score;
+                //Olasýlýk bulma hesabýný standart ACO formülündeki toplam skora bölme iþlemiyle
                 //yapmadýk, çünkü halihazýrda rulet tekerleði ile gidilecek yolu hesapladýðýmýz için
                 //bu bölme iþlemi yapýlsa da rulet dilimlerinin büyüklüðü, yüzdelikleri ayný olacak.
-                //ayrýca sahnedeki yüzlerce araç için bölme iþlemini gerçekleþtirmeyerek performanstan da kazanç saðlýyoruz
+                //Ayrýca sahnedeki yüzlerce araç için bölme iþlemini gerçekleþtirmeyerek performanstan da
+                //kazanç saðlamýþ oluyoruz
             }
         }
 
-        // 5. Rulet Tekerleði Seçimi
+        //Rulet tekerleði seçimi ile gidilecek þehri seçer
         float randomValue = Random.Range(0f, totalScore);
         float cumulativeScore = 0f;
 
@@ -106,28 +107,29 @@ public class ACOManager : MonoBehaviour {
             }
         }
 
-        return availableNeighbors[0];
+        return availableNeighbors[0]; //Güvenlik amaçlý, þehir seçilemediyse ilk mevcut þehre dön
     }
 
     public void AddPheromones(List<Road> traveledRoads) {
         float totalDistance = 0;
-        // 1. Toplam mesafeyi hesapla
-        foreach (Road r in traveledRoads) {
+        foreach (Road r in traveledRoads) { //Toplam mesafeyi hesaplar
             totalDistance += r.distance;
         }
 
-        // 2. Yol ne kadar kýsaysa o kadar çok feromon býrak (Q / L^2 formülü) //þehirler arasýndaki yollarýn
-        // uzunluðu birbirine oldukça yakýn olduðu için standart formülde birkaç kmlik kýsa olan yol araçlarý
-        // o yola yönlendirmeye ikna edecek kadar fazla feromon salgýlamayabilir, o yüzden förmülü kýyasla uzun
-        // yollar seçildiðinde daha cezelandýrýcý bir þekilde az feromon býrakmasý þeklinde güncelledik
+        //(Q / L^2 formülü) þehirler arasýndaki yollarýn uzunluðu birbirine oldukça yakýn olduðu için
+        //standart formülde araçlar birkaç kmlik kýsa olan yolu seçtiklerinde formül yeterince cezalandýrýcý
+        //ve ödüllendirici olamayabiliyor, o yüzden förmülü kýyasla uzun yollar seçildiðinde
+        //daha cezelandýrýcý bir þekilde az feromon býrakmasý þeklinde güncelledik
         float pheromoneToAdd = Q / (totalDistance * totalDistance); 
 
-        foreach (Road r in traveledRoads) {
+        foreach (Road r in traveledRoads) { //tüm yollara feromon ekler
             r.pheromoneLevel += pheromoneToAdd;
         }
 
     }
 
+
+    //getter ve setterlar
     public float GetAlpha() {
         return alpha;
     }

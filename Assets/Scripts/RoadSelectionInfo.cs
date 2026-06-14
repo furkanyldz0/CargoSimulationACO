@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class RoadSelectionInfo : MonoBehaviour
 {
@@ -28,16 +29,10 @@ public class RoadSelectionInfo : MonoBehaviour
             Vector3 mousePosition = Input.mousePosition;
             Ray ray = Camera.main.ScreenPointToRay(mousePosition);
 
-            if (Physics.Raycast(ray, out RaycastHit raycastHit, 10000f, roadLayer)) {
+            if (Physics.Raycast(ray, out RaycastHit raycastHit, 10000f, roadLayer) && !EventSystem.current.IsPointerOverGameObject()) {
                 Road highlightedRoad = raycastHit.transform.GetComponentInParent<Road>();
                 if (highlightedRoad != null) {
-                    string startCityName = highlightedRoad.startCitySO.name;
-                    string endCityName= highlightedRoad.endCitySO.name;
-
-                    roadInfoText.SetText(($"{startCityName} - {endCityName} Yolu" +
-                        $"\r\n{highlightedRoad.distance.ToString("F2")} km"));
-                    roadInfoText.transform.position = mousePosition;
-                    roadInfoText.gameObject.SetActive(true);
+                    ShowRoadInfo(mousePosition, highlightedRoad);
                 }
             }
             else { //raycast ile herhangi bir yol nesnesi algýlanmadýðý zaman
@@ -48,5 +43,15 @@ public class RoadSelectionInfo : MonoBehaviour
         }
 
         
+    }
+
+    private void ShowRoadInfo(Vector3 mousePosition, Road highlightedRoad) {
+        string startCityName = highlightedRoad.startCitySO.name;
+        string endCityName = highlightedRoad.endCitySO.name;
+
+        roadInfoText.SetText(($"{startCityName} - {endCityName} Yolu" +
+            $"\r\n{highlightedRoad.distance.ToString("F2")} km"));
+        roadInfoText.transform.position = mousePosition;
+        roadInfoText.gameObject.SetActive(true);
     }
 }

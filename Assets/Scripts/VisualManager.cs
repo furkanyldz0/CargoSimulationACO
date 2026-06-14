@@ -68,10 +68,11 @@ public class VisualManager : MonoBehaviour
         startCityText.text = "Baþlangýç Þehri:\n-";
     }
 
+    //Seçim moduna göre þehir seçimini görsel olarak bildirir
     public void SelectCity(City city) {
         if (LevelManager.Instance.IsSelectingStartCity)
             SelectStartCity(city);
-        else
+        else //Hedef þehir seçimi
             SelectTargetCity(city);
     }
 
@@ -93,7 +94,7 @@ public class VisualManager : MonoBehaviour
         startCityText.text = $"Baþlangýç Þehri:\n{city.GetCitySO().name}";
     }
 
-    private void ActivateSelectionFilter() { //eðer setactive false true þeklinde yaparsam daha çok yük bindiriyormuþ
+    private void ActivateSelectionFilter() { //Selection volume'u weight'ini ayarlarak açýyoruz, setactive false true þekilde yapýlýrsa performansa etki ediyor
         selectionFilterVolume.weight = 1f;
     }
     private void DisableSelectionFilter() {

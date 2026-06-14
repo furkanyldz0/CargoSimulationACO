@@ -9,7 +9,7 @@ public class GameManagerUI : MonoBehaviour
     [SerializeField] private Button cancelSelectCityButton;
     [SerializeField] private Button stopButton;
 
-    [SerializeField] private Slider vehicleSpawnTimeSlider;
+    [SerializeField] private Slider vehicleSpawnTimeSlider; //slider'larý devre dýþý býrakmak için
     [SerializeField] private Slider startPheromoneLevelSlider;
 
     private void Start() {
@@ -23,6 +23,8 @@ public class GameManagerUI : MonoBehaviour
         selectStartCityButton.gameObject.SetActive(false);
         selectTargetCityButton.gameObject.SetActive(true);
         cancelSelectCityButton.gameObject.SetActive(true);
+
+        AudioManager.Instance.PlayButtonClickSound();
     }
 
     public void EnterSelectingTargetCityProcess() {
@@ -39,7 +41,8 @@ public class GameManagerUI : MonoBehaviour
             NotificationManagerUI.Instance.Notificate(notificationText);
             Debug.Log(notificationText);
         }
-        
+
+        AudioManager.Instance.PlayButtonClickSound();
     }
 
     public void CancelSelection() {
@@ -48,6 +51,8 @@ public class GameManagerUI : MonoBehaviour
         EnterIdleScreen();
         
         Debug.Log("Þehir seçimi iptal edildi.");
+
+        AudioManager.Instance.PlayButtonBackClickSound();
     }
 
     public void InitiateSimulation() {
@@ -65,12 +70,16 @@ public class GameManagerUI : MonoBehaviour
             VisualManager.Instance.ExitCitySelectionMode();
 
             Debug.Log("Simülasyon baþladý, hedef þehir: " + targetCity.GetCitySO().name);
+
+            AudioManager.Instance.PlayInitiateSimulationSound();
         }
         else if(targetCity == null){
             string notificationText = "Hedef þehir seçiniz!";
             NotificationManagerUI.Instance.Notificate(notificationText);
             Debug.Log(notificationText);
         }
+
+        AudioManager.Instance.PlayButtonClickSound();
     }
 
     public void StopSimulation() {
@@ -78,6 +87,8 @@ public class GameManagerUI : MonoBehaviour
         EnterIdleScreen();
 
         Debug.Log("Simülasyon durduruldu.");
+
+        AudioManager.Instance.PlayButtonBackClickSound();
     }
 
     public void EnterIdleScreen() {

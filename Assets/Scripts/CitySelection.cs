@@ -23,7 +23,7 @@ public class CitySelection : MonoBehaviour
 
 
 
-        if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject()) { //yeni input system ile güncellenecek
+        if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject()) {
             Vector3 raycastPosition = Input.mousePosition;
             Ray ray = Camera.main.ScreenPointToRay(raycastPosition);
 
@@ -32,6 +32,7 @@ public class CitySelection : MonoBehaviour
                     if(IsValidToSelect(city)) {
                         SetSelectedCity(city);
                         Debug.Log(city.GetCitySO().name);
+                        AudioManager.Instance.PlayCitySelectSound();
                     }
                     else {
                         string notificationText = "Hedef þehir ile baþlangýç þehri ayný olamaz!";

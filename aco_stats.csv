@@ -1,1 +1,2 @@
 deliveryIndex,timestamp,alpha,beta,evaporationRate,Q,acoLength,acoPath,dijkstraLength,dijkstraPath,ratio
+1,3.37,1.00,1.00,0.050,10000,152.99,K->G->Y,152.99,K->G->Y,1.0000

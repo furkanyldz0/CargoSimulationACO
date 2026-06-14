@@ -8,7 +8,7 @@ public class Road : MonoBehaviour {
     public Transform waypointParent;
 
     public float distance;
-    public float pheromoneLevel; //ilk deðer AcoManager'dan alýnýyor
+    public float pheromoneLevel;
     public int useCount = 0;
 
 
@@ -26,8 +26,9 @@ public class Road : MonoBehaviour {
             CityPool.Instance.GetCityForCitySO(endCitySO).transform.position;
     }
 
+    //Üstündeki waypointler ile yolun mesafesini hesaplar
     public void CalculateDistance() {
-        SnapWaypoints(); //Önce uçlarý sabitle, sonra ölç
+        SnapWaypoints();
         distance = 0f;
         for (int i = 0; i < waypointParent.childCount - 1; i++) {
             distance += Vector3.Distance(waypointParent.GetChild(i).position, waypointParent.GetChild(i + 1).position);

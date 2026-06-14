@@ -10,9 +10,9 @@ public class VehicleManager : MonoBehaviour
     [SerializeField] private GameObject vehiclePrefab;
 
     [Header("Araç özellikleri")]
-    [SerializeField] private int vehicleSpeed = 40;
-    [SerializeField] private float spawnTime = 1f;
-    [SerializeField] private int vehicleSpawnCount;
+    [SerializeField] private int vehicleSpeed = 80;
+    [SerializeField] private float spawnTime = .2f;
+    [SerializeField] private int vehicleSpawnCount = 5000;
 
     private int currentVehicleCount = 0;
     private bool isMaximumVehicleCountReached;
@@ -50,19 +50,20 @@ public class VehicleManager : MonoBehaviour
         }
     }
 
-    private void GenerateVehicle() {//sýnýfa liste tanýmlanýp oluþturulan araçlar bu listeye atanabilir
+    private void GenerateVehicle() {
         currentVehicleCount++;
         Instantiate(vehiclePrefab, transform.position, Quaternion.identity);
     }
 
     public void SendAllVehiclesToHome() {
-        currentAllVehicles = GetAllVehiclesInScene(); //performans açýsýndan sýkýntý yaratýr mý acaba
+        currentAllVehicles = GetAllVehiclesInScene();
         foreach (Vehicle vehicle in currentAllVehicles) {
-            vehicle.TravelHome(true);
+            vehicle.TravelHome(isForceReturn: true);
         }
     }
 
-    public void ResetVariables() {
+    //Araç üretim þartlarýný sýfýrlar
+    public void ResetCurrentVehicleCount() {
         currentVehicleCount = 0;
         isMaximumVehicleCountReached = false;
     }

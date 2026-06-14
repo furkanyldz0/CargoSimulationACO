@@ -9,9 +9,9 @@ public class GraphManager : MonoBehaviour
     public CitySO TargetCitySO { get; private set; }
     public CitySO StartCitySO { get; private set; }
 
-    [SerializeField] private Transform RoadParent; //tüm road'larý içeren gameobject
-    private List<Road> allRoads = new List<Road>();
-    private Dictionary<(CitySO, CitySO), Road> roadLookup = new Dictionary<(CitySO, CitySO), Road>();
+    [SerializeField] private Transform RoadParent; //Tüm road'larý içeren gameobject
+    private List<Road> allRoads = new List<Road>(); //Sahnedeki tüm yollar
+    private Dictionary<(CitySO, CitySO), Road> roadLookup = new Dictionary<(CitySO, CitySO), Road>(); //Tüm yollar fakat sözlük yapýsýnda
 
     private void Awake() {
         if(Instance != null) {
@@ -20,7 +20,7 @@ public class GraphManager : MonoBehaviour
         Instance = this;
 
         allRoads = RoadParent.GetComponentsInChildren<Road>().ToList();
-        foreach (Road road in allRoads) {
+        foreach (Road road in allRoads) { //tüm yollarý tekrar sözlüðe atýyoruz, sözlükte karmaþýklýk O(1) olduðu için eriþmesi daha performanslý
             roadLookup[(road.startCitySO, road.endCitySO)] = road;
         }
     }

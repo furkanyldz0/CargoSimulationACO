@@ -42,7 +42,7 @@ public class StatsPanelUI : MonoBehaviour {
 
     private void LevelManager_OnSimulationStarted(object sender, System.EventArgs e) {
         statsButton.SetActive(true);
-        RefreshLabels(); // başlangıç verileri (Dijkstra hazır, henüz teslimat yok)
+        RefreshLabels(); //başlangıç verileri (Dijkstra hazır, henüz teslimat yok)
     }
 
     private void LevelManager_OnSimulationStopped(object sender, System.EventArgs e) {
@@ -55,10 +55,14 @@ public class StatsPanelUI : MonoBehaviour {
     }
 
     public void HandleWindowButton() {
-        if (isPanelOpened)
+        if (isPanelOpened){
             HideStatsPanel();
-        else
+            AudioManager.Instance.PlayButtonBackClickSound();
+        }
+        else{
             ShowStatsPanel();
+            AudioManager.Instance.PlayButtonClickSound();
+        }
     }
 
     public void ShowStatsPanel() {
@@ -84,15 +88,15 @@ public class StatsPanelUI : MonoBehaviour {
     private void RefreshLabels() {
         if (!StatsManager.Instance.IsRunActive()) return;
 
-        // Toplam teslimat
+        //Toplam teslimat
         deliveryCountText.text = StatsManager.Instance.GetDeliveryCount().ToString();
 
-        // Dijkstra rotası
+        //Dijkstra rotası
         var dijkstraPath = StatsManager.Instance.GetDijkstraPath();
         float dijkstraLength = StatsManager.Instance.GetDijkstraLength();
         dijkstraInfoText.text = $"{PathToString(dijkstraPath)}\nUzunluk: {dijkstraLength:F2} km";
 
-        // ACO en iyi
+        //ACO'nun bulduğu en iyi rota
         var bestAcoRoute = StatsManager.Instance.GetBestAcoRoute();
         if (bestAcoRoute != null) {
             float bestAcoLen = StatsManager.Instance.GetBestAcoLength();
@@ -102,7 +106,7 @@ public class StatsPanelUI : MonoBehaviour {
             bestAcoInfoText.text = "-";
         }
 
-        // ACO yakınsadığı (pheromone-dominant)
+        //ACO'nun yakınsadığı rota
         var dominantPath = StatsManager.Instance.ComputeDominantPath();
         if (dominantPath != null && dominantPath.Count > 1 && dominantPath[dominantPath.Count - 1] == GraphManager.Instance.TargetCitySO) {
             float dominantLen = Dijkstra.CalculatePathLength(dominantPath);
@@ -111,7 +115,7 @@ public class StatsPanelUI : MonoBehaviour {
             dominantInfoText.text = "-"; //henüz yakınsama yok
         }
 
-        // Oranlar
+        //Oranlar
         float last = StatsManager.Instance.GetLastRatio();
         float avg = StatsManager.Instance.GetAverageRatio();
         float best = StatsManager.Instance.GetBestRatio();
@@ -119,7 +123,7 @@ public class StatsPanelUI : MonoBehaviour {
         averageRatioText.text = avg > 0 ? $"{avg:F2}x (son 50)" : "-";
         bestRatioText.text = best < float.MaxValue ? $"{best:F2}x" : "-";
 
-        // Parametreler
+        //Parametreler
         float alpha = ACOManager.Instance.GetAlpha();
         float beta = ACOManager.Instance.GetBeta();
         float evap = ACOManager.Instance.GetEvaporationRate();

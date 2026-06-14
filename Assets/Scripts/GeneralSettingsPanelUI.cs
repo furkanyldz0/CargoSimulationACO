@@ -59,6 +59,7 @@ public class GeneralSettingsPanelUI : MonoBehaviour
         HideSettingsPanel();
     }
 
+    //VehicleManager ve LevelManager'da tanýmlý ilk deðerleri alýr
     private void GetInitialSettings() {
         //vehicleSpawnTime
         vehicleSpawnTime = VehicleManager.Instance.GetSpawnTime();
@@ -85,10 +86,15 @@ public class GeneralSettingsPanelUI : MonoBehaviour
     }
 
     public void HandleWindowButton() {
-        if (isPanelOpened)
+        if (isPanelOpened) {
             HideSettingsPanel();
-        else
+            AudioManager.Instance.PlayButtonBackClickSound();
+        }
+        else {
             ShowSettingsPanel();
+            AudioManager.Instance.PlayButtonClickSound();
+        }
+            
     }
 
     public void HandlePheromoneTrailToggle() {

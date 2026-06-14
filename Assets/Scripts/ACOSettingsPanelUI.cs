@@ -10,6 +10,8 @@ public class ACOSettingsPanelUI : MonoBehaviour
     [SerializeField] private Transform activePositionTransform;
     [SerializeField] private Transform disabledPositionTransform;
 
+    [SerializeField] private GameObject informationPanel;
+
     [SerializeField] private GameObject downButton;
     [SerializeField] private GameObject upButton;
 
@@ -52,7 +54,8 @@ public class ACOSettingsPanelUI : MonoBehaviour
 
         VisualManager.Instance.OnExitedSelectionMode += Instance_OnExitedSelectionMode;
 
-        HideACOSettingsPanel();
+        //HideACOSettingsPanel();
+        //HideInformationPanel();
     }
 
     private void OnDestroy() {
@@ -63,6 +66,7 @@ public class ACOSettingsPanelUI : MonoBehaviour
         HideACOSettingsPanel();
     }
 
+    //ACOManager'da tanýmlý deðerleri alýr
     private void GetInitialSettings() {
         //alpha
         alpha = ACOManager.Instance.GetAlpha();
@@ -107,6 +111,8 @@ public class ACOSettingsPanelUI : MonoBehaviour
             .SetEase(Ease.OutQuart)
             .OnComplete(() => {
             });
+
+        AudioManager.Instance.PlayButtonClickSound();
     }
 
     public void HideACOSettingsPanel() {
@@ -121,6 +127,18 @@ public class ACOSettingsPanelUI : MonoBehaviour
                 ACOSettingsPanel.gameObject.SetActive(false);
                 //settingsButton.enabled = true;
             });
+
+        AudioManager.Instance.PlayButtonBackClickSound();
+    }
+
+    public void ShowInformationPanel() {
+        informationPanel.SetActive(true);
+        AudioManager.Instance.PlayButtonClickSound();
+    }
+
+    public void HideInformationPanel() {
+        informationPanel.SetActive(false);
+        AudioManager.Instance.PlayButtonBackClickSound();
     }
 
     public void UpdateAlpha() {

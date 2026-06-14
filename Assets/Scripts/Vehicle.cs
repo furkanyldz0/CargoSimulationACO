@@ -8,18 +8,17 @@ public class Vehicle : MonoBehaviour
     private static int MoveSpeed;
 
     private float rotateSpeed = 100f;
-    private Vector3 targetRotation;
+    private Vector3 targetRotation; //Aracýn bakacaðý yönü ifade eder
 
-    private List<Transform> waypoints = new List<Transform>();
-    private int currentWaypointIndex = -1;
+    private List<Transform> waypoints = new List<Transform>(); //Aracýn hareketini saðlayan, seyahat edeceði yoldan elde edilen takip nesneleri
+    private int currentWaypointIndex = -1; //Araç konumunu liste içindeki waypoint'lere eþitleyerek hareket eder, her yeni yola baþladýðýnda sýfýrlanýr
 
-    // Sýnýfýn üst kýsmýna ekle
-    private List<Road> traveledRoads = new List<Road>(); //feromon eklenmesi için
-    private List<CitySO> visitedCities = new List<CitySO>(); //önceki þehirlere tekrar gitmemesi için
+    private List<Road> traveledRoads = new List<Road>(); //Ziyaret edilen yollar, feromon eklenmesi için
+    private List<CitySO> visitedCities = new List<CitySO>(); //Önceden ziyaret edilen þehirlere gitme durumunu kontrol etmek için
 
-    private CitySO homeCity, currentCity, nextCity;
+    private CitySO homeCity, currentCity, nextCity; //Baþlangýç þehri - þuan bulunduðu þehir - gideceði þehir
 
-    [SerializeField] private GameObject cargoPackageVisual;
+    [SerializeField] private GameObject cargoPackageVisual; //Kargo aracýnýn arkasýndaki sarý kutu modeli, seyahat tamamlandýðýnda görünmez hale getirilir
 
     public enum State {
         Idle,
@@ -27,7 +26,8 @@ public class Vehicle : MonoBehaviour
         Returning
     }
 
-    private void Start() {
+    //Start metodu ilgili nesne oluþturulduðunda(instantiate) çaðrýlýr, kargo aracý oluþurken çaðrýlan fonksiyonlar
+    private void Start() {  
         MoveSpeed = VehicleManager.Instance.GetVehicleSpeed();
         homeCity = GraphManager.Instance.StartCitySO;
         currentCity = homeCity;
@@ -41,6 +41,7 @@ public class Vehicle : MonoBehaviour
     private void Update() {
         switch (state) {
             case State.Idle:
+                //Idle state'i var fakat simülasyonda araçlarýn idle'da olduðu bir durum yok, ileride eklenebilir
                 //Debug.Log("Araç boþta...");
                 break;
 
@@ -54,6 +55,7 @@ public class Vehicle : MonoBehaviour
         }
     }
 
+    //Liste içindeki waypointleri her karede kendi konumuna eþitleyerek hareketi saðlar
     private void MoveToNextWaypoint() {
         transform.position = Vector3.MoveTowards(transform.position, waypoints[currentWaypointIndex + 1].position,
             Time.deltaTime * MoveSpeed * LevelManager.TimeScale);
@@ -64,6 +66,7 @@ public class Vehicle : MonoBehaviour
         }
     }
 
+    //Hedef þehre giderken çaðrýlan fonksiyonlar, waypointIndex'i günceller 
     private void HandleTraveling() {
         if (currentWaypointIndex < waypoints.Count - 1) {
             MoveToNextWaypoint();
@@ -78,18 +81,19 @@ public class Vehicle : MonoBehaviour
                         //hedef þehre varýldý
                         DepositPheromones();
 
-                        TravelHome(false);
-                        //state = State.Returning; //djikstra ile eve dönecek
+                        TravelHome(isForceReturn: false);
                         cargoPackageVisual.SetActive(false);
                     }
                     else {
+                        //hedef þehre gelinmedi, seyahate devam
                         TravelNextCity();
                     }
                 }
             }
         }
     }
-
+    
+    //Dikstra'nýn hesapladýðý rotadaki waypointleri takip eder
     private void HandleReturning() {
         if (currentWaypointIndex < waypoints.Count - 1) {
             MoveToNextWaypoint();
@@ -105,15 +109,14 @@ public class Vehicle : MonoBehaviour
         }
     }
 
+    //ACO ile sonraki seyahat edilecek þehri belirler
     private void TravelNextCity() {
-        // BURASI KRÝTÝK: Listeyi metoda parametre olarak gönderiyoruz
         nextCity = ACOManager.Instance.ChooseNextCity(currentCity, visitedCities);
         //Debug.Log(nextCity);
 
         if (nextCity != null) {
             Road road = GraphManager.Instance.GetRoadBetween(currentCity, nextCity);
 
-            // if (!traveledRoads.Contains(road)) ping pong yaptýðýnda cezalandýrmasý için 
             traveledRoads.Add(road);
 
             if (!visitedCities.Contains(nextCity)) visitedCities.Add(nextCity);
@@ -124,58 +127,66 @@ public class Vehicle : MonoBehaviour
         }
     }
 
-    public void TravelHome(bool isForceReturn) {
-        if(state != State.Returning) { //bunu koymazsam dýþarýdan çaðýrdýðýmda uçarak targetcity'e dönüyorlar
+    //Baþlangýç þehrine dönmek üzere Dijkstra'nýn hesapladýðý rotayý alýr
+    public void TravelHome(bool isForceReturn = true) {
+        if(state != State.Returning) { //Dönen araçlarda çaðrýldýðýnda uçarak targetcity'e dönmemesine karþýn
             waypoints.Clear();
 
-            if (currentCity == homeCity) { //baþlangýçtan sonra bir þehri ziyaret edememiþse
+            if (currentCity == homeCity) { //Baþlangýçtan sonra bir þehri ziyaret edememiþse
+                //Araçlar baþlangýçtan sonra henüz bir þehre varamadýysa kitleniyorlar, bunu önlemek için
+                //mevcut bulunduðu yolun waypointleri alýnarak doðrudan baþlangýca döner
                 Road road = GraphManager.Instance.GetRoadBetween(nextCity, homeCity);
                 foreach (Transform child in road.waypointParent)
                     waypoints.Add(child);
             }
-            else {
-                List<CitySO> path = null;
-                if (!isForceReturn && Dijkstra.CachedStartToTargetPath != null)
-                    path = Dijkstra.GetCachedReturnPath();
-                else
-                    path = Dijkstra.FindShortestPath(currentCity, homeCity);
+            else { //Baþlangýçtan sonra bir þehri ziyaret ettiyse, Dijkstra hesaplanýr
+                List<CitySO> pathCitiesSO = null;
+                if (!isForceReturn && Dijkstra.CachedStartToTargetPath != null) //Araçlar hedefe varýldýðýnda çaðrýlýr
+                    pathCitiesSO = Dijkstra.GetCachedReturnPath(); //path deðiþkeni Dijkstra'nýn hesapladýðý rotanýn þehirlerini içerir
+                else //Simülasyon durdurulduðunda çaðrýlýr
+                    pathCitiesSO = Dijkstra.FindShortestPath(currentCity, homeCity); 
                 
 
-                CitySO stepStart = currentCity; // Baþlangýcýmýz þu anki hedef þehir
-
-                foreach (CitySO stepEnd in path) {
+                CitySO stepStart = currentCity; //Dönüþü baþlatacaðý þehir üzerinden baþlangýca doðru olan
+                foreach (CitySO stepEnd in pathCitiesSO) {//tüm yollarýn waypointini alýr
                     Road road = GraphManager.Instance.GetRoadBetween(stepStart, stepEnd);
                     if (road != null) {
-                        // O yola ait tüm waypointleri sýrayla ana listeye ekle
                         foreach (Transform child in road.waypointParent) {
                             waypoints.Add(child);
                         }
                     }
-                    stepStart = stepEnd; // Bir sonraki yolun baþlangýcý için þehri kaydýr
+                    stepStart = stepEnd;
                 }
             }
             currentWaypointIndex = -1;
-            state = State.Returning;
+            state = State.Returning; 
         }
     }
 
+    //Teslimat sonunda ziyaret ettiði yollara feromon býrakýr ve teslimat bilgilerini kaydeder
     private void DepositPheromones() {
-        // Stats için ACO yol verilerini hazýrla ve bildir
-        List<CitySO> acoPath = new List<CitySO> { homeCity };
-        float acoLength = 0f;
-        foreach (Road r in traveledRoads) {
-            acoPath.Add(r.endCitySO);
-            acoLength += r.distance;
-        }
-        StatsManager.Instance.RegisterDelivery(acoPath, acoLength);
+        RegisterDelivery();
 
-        // Mevcut feromon ekleme mantýðý
         ACOManager.Instance.AddPheromones(traveledRoads);
 
         traveledRoads.Clear();
         visitedCities.Clear();
     }
 
+    //StatsManager'a Teslimat bilgilerini iletir
+    private void RegisterDelivery() {
+        //Ýstatistik paneli için ziyaret edilen yollardan þehir bilgilerini alýr
+        List<CitySO> acoPathCitiesSO = new List<CitySO> { homeCity };
+        float acoLength = 0f;
+        foreach (Road r in traveledRoads) {
+            acoPathCitiesSO.Add(r.endCitySO);
+            acoLength += r.distance;
+        }
+
+        StatsManager.Instance.RegisterDelivery(acoPathCitiesSO, acoLength);  
+    }
+
+    //Aracýn takip ettiði waypoint listesini günceller
     private void UpdateWaypoints(Transform waypointParent) {
         waypoints.Clear();
         foreach (Transform child in waypointParent) {

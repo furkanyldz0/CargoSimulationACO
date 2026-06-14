@@ -47,10 +47,10 @@ public class LevelManager : MonoBehaviour //levelmanager yerine başka isim yaza
         IsSimulationInitiated = true;
         IsSelectingCity = false;
 
-        Dijkstra.CacheStartToTargetPath();   // ← ÖNCE cache (StartCitySO ve TargetCitySO ikisi de set edilmiş olmalı)
-        StatsManager.Instance.StartRun();
+        Dijkstra.CacheStartToTargetPath(); //Başlangıçtan hedefe Dijsktra'yı hesapla, (StartCitySO ve TargetCitySO belirlenmiş olmalı)
+        StatsManager.Instance.StartRun(); //İstatistik panelindeki ilk bilgileri atar, csv dosyası açılır
 
-        OnSimulationStarted?.Invoke(this, EventArgs.Empty);
+        OnSimulationStarted?.Invoke(this, EventArgs.Empty); //StatsPanelUI dinliyor, istatistik panelinin aktif olması için
     }
 
     public void ResetLevel() { //en baştaki durum
@@ -66,7 +66,7 @@ public class LevelManager : MonoBehaviour //levelmanager yerine başka isim yaza
 
         CitySelection.Instance.SetSelectedCity(null); //bunu başlatma kısmında da çağrabiliriz
 
-        VehicleManager.Instance.ResetVariables();
+        VehicleManager.Instance.ResetCurrentVehicleCount();
         VehicleManager.Instance.SendAllVehiclesToHome();
 
         ACOManager.Instance.ResetStartPheromone();
@@ -78,7 +78,7 @@ public class LevelManager : MonoBehaviour //levelmanager yerine başka isim yaza
     private void ResetAllPheromoneTrails() {
         List<Road> roads = GraphManager.Instance.GetAllRoads();
         foreach (Road road in roads) {
-            road.GetComponent<PheromoneVisualizer>().ResetPheromoneTrail();
+            road.GetComponent<PheromoneVisualizer>().ResetPheromoneTrailThickness();
         }
     }
 

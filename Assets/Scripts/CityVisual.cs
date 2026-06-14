@@ -36,7 +36,7 @@ public class CityVisual : MonoBehaviour
         if (e.city == city) { //bu event her bir þehir seçildiðinde tüm cityvisual'larda tetikleniyor, nesne kontrolü yaparak tek bir city için görsel güncelleme yapýyoruz
             SelectAsTarget();
         }
-        else if (city.GetCitySO() == GraphManager.Instance.StartCitySO) {
+        else if (city.GetCitySO() == GraphManager.Instance.StartCitySO) { //baþlangýç þehrinin görselini korumasý için
             SelectAsStart();
         }
         else {

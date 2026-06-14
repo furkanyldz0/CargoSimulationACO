@@ -10,7 +10,7 @@ public class NotificationManagerUI : MonoBehaviour
     [SerializeField] private Transform tweenBottomStartPositionTransform;
     [SerializeField] private Transform tweenTopEndPositionTransform;
 
-    private Sequence mySequence;
+    private Sequence mySequence; //birden fazla tween'i kullanmak için gerekli
 
     private void Awake() {
         if(Instance != null) {
@@ -30,14 +30,13 @@ public class NotificationManagerUI : MonoBehaviour
         mySequence.SetAutoKill(false);
 
         mySequence.Append(textTween)
-            .Insert(1f, notificationText.DOFade(0f, 1.5f).SetEase(Ease.InQuad))
+            .Insert(1f, notificationText.DOFade(0f, 1.5f).SetEase(Ease.InQuad)) //1f saniye sonra DOFade tweeni çaðrýlýr
             .OnComplete(() => {
                 notificationText.gameObject.SetActive(false);
                 //notificationText.transform.position = tweenBottomStartPositionTransform.position;
                 //tekrar konumunu manuel sýfýrlamama gerek yok restart atarken aklýnda tutuyor
             });
-
-        //mySequence.Pause();
+        //sequence'i start'da tanýmladýk, artýk tekrar tekrar bu deðerleri geçmemize gerek yok
     }
 
     public void Notificate(string warningMessage) {
@@ -52,7 +51,7 @@ public class NotificationManagerUI : MonoBehaviour
     }
 
     private void OnDestroy() {
-        // AutoKill kapattýðýmýz için obje silinirken belleði temizlemeyi unutmamalýyýz
+        //AutoKill'i kapattýðýmýz için nesnenin silinmesine karþýn bellekte yer kaplamamasý için
         mySequence?.Kill();
     }
 }

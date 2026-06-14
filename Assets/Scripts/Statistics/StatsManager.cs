@@ -9,31 +9,31 @@ public class StatsManager : MonoBehaviour {
     public static StatsManager Instance { get; private set; }
 
     private StreamWriter csvWriter;
-    private static readonly CultureInfo Inv = CultureInfo.InvariantCulture;
+    private static readonly CultureInfo Inv = CultureInfo.InvariantCulture; //csv sayıları, metinleri yazma formatı (csv sütunları virgül ile, floatlar nokta ile)
 
     public event EventHandler OnStatsUpdated;
 
-    // Kayan pencere boyutu (son N teslimat)
+    //Hareketli ortalama
     private const int WINDOW_SIZE = 50;
 
-    // Run başında bir kez hesaplanıp cache'lenen Dijkstra referansı
+    //Run başında bir kez hesaplanıp cache'lenen Dijkstra referansı
     private List<CitySO> dijkstraPath;
     private float dijkstraLength;
 
-    // Run durumu
+    //Run durumu
     private bool isRunActive;
     private int deliveryCount;
     private float runStartTime;
 
-    // En iyi (en kısa) ACO rotası
+    //En iyi (en kısa) ACO rotası
     private List<CitySO> bestAcoRoute;
     private float bestAcoLength = float.MaxValue;
     private int bestAcoRouteCount;
 
-    // Oran istatistikleri
+    //Oran istatistikleri
     private float lastRatio;
     private float bestRatio = float.MaxValue;
-    private Queue<float> recentRatios = new Queue<float>();
+    private Queue<float> recentRatios = new Queue<float>(); //son window_size adet teslimatın ortalamaları
 
     private void Awake() {
         if (Instance != null) {
@@ -107,11 +107,11 @@ public class StatsManager : MonoBehaviour {
         OnStatsUpdated?.Invoke(this, EventArgs.Empty);
     }
 
-    // --- Yardımcı metodlar ---
+    //Yardımcı metodlar
 
     private string PathToString(List<CitySO> path) {
         if (path == null || path.Count == 0) return "-";
-        return string.Join("->", path.Select(c => c.cityName));
+        return string.Join("->", path.Select(c => c.cityName)); //path.select sadece şehir isimlerini verir, path liste yapısında olduğu için birleşmiş rotanın hepsini veriyor
     }
 
     private bool PathsEqual(List<CitySO> a, List<CitySO> b) {
@@ -125,7 +125,7 @@ public class StatsManager : MonoBehaviour {
 
     public float GetAverageRatio() {
         if (recentRatios.Count == 0) return 0;
-        return recentRatios.Average();
+        return recentRatios.Average(); //recentRatios'un boyutu window_size kadar, bu collection'daki sayıların ortalaması alınıyor
     }
 
     public List<CitySO> ComputeDominantPath() {
@@ -136,13 +136,13 @@ public class StatsManager : MonoBehaviour {
 
         List<CitySO> path = new List<CitySO> { start };
         CitySO current = start;
-        int safetyLimit = 100; // çok uzun döngülerden koruma
+        int safetyLimit = 100; //çok uzun döngülerden koruma
 
         while (current != target && safetyLimit-- > 0) {
             Road bestRoad = null;
             float maxPheromone = -1f;
 
-            foreach (CitySO neighbor in current.neighbors) {
+            foreach (CitySO neighbor in current.neighbors) { //current'in komşularına giden yoldaki feromon miktarlarına bakıyoruz
                 if (path.Contains(neighbor)) continue; //aynı şehri atlayarak döngü oluşmasını engeller
 
                 Road road = GraphManager.Instance.GetRoadBetween(current, neighbor);
@@ -154,7 +154,7 @@ public class StatsManager : MonoBehaviour {
 
             if (bestRoad == null) break; // çıkmaz, koloni henüz buraya kadar yakınsamış
 
-            current = bestRoad.endCitySO;
+            current = bestRoad.endCitySO; //current target'a eşitlenince döngü bitecek
             path.Add(current);
         }
 
@@ -162,8 +162,9 @@ public class StatsManager : MonoBehaviour {
     }
 
     private void OpenCsvFile() {
-        string fullPath = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "aco_stats.csv"));
-        csvWriter = new StreamWriter(fullPath, append: false); // append:false → her run'da üzerine yazılır
+        //path.combine metodu os'e göre stringler arasına eğik çizgi koyar, getfullpath yolun son halini ifade eder (.. olmadan)
+        string fullPath = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "aco_stats.csv")); //app.dataPath unity asset klasörünün içi, .. ise bir klasör geriye, yani assets klasörünün dışına kaydedilir
+        csvWriter = new StreamWriter(fullPath, append: false); // append:false ile her run'da üzerine yazılır
         csvWriter.WriteLine("deliveryIndex,timestamp,alpha,beta,evaporationRate,Q,acoLength,acoPath,dijkstraLength,dijkstraPath,ratio");
 
         Debug.Log($"[Stats] CSV açıldı: {fullPath}");
@@ -171,8 +172,8 @@ public class StatsManager : MonoBehaviour {
 
     private void CloseCsvFile() {
         if (csvWriter != null) {
-            csvWriter.Flush();
-            csvWriter.Close();
+            csvWriter.Flush(); //bellekte kalan verileri zorla diske yazdırır
+            csvWriter.Close(); //StreamWriter'ı kapatır
             csvWriter = null;
         }
     }
@@ -203,10 +204,10 @@ public class StatsManager : MonoBehaviour {
         );
 
         csvWriter.WriteLine(line);
-        csvWriter.Flush(); // her satırda flush — oyun çökerse veri kaybolmasın
+        csvWriter.Flush(); //her satırda flush - oyun çökerse veri kaybolmasın
     }
 
-    // Oyun kapatıldığında veya GameObject destroy olduğunda dosyayı düzgün kapat
+    //Oyun kapatıldığında veya GameObject destroy olduğunda dosyayı düzgün kapat
     private void OnApplicationQuit() {
         CloseCsvFile();
     }
@@ -215,7 +216,6 @@ public class StatsManager : MonoBehaviour {
         CloseCsvFile();
     }
 
-    // --- UI için getter'lar (Faz 3'te kullanacağız) ---
 
     public bool IsRunActive() { return isRunActive; }
     public int GetDeliveryCount() { return deliveryCount; }
