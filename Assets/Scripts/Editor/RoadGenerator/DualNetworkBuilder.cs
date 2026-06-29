@@ -21,7 +21,7 @@ public class DualNetworkBuilder : MonoBehaviour {
             Debug.LogError(this + " için networkParent belirlenmemiþ!");
 
         for (int i = networkParent.childCount - 1; i >= 0; i--) {
-            Undo.DestroyObjectImmediate(networkParent.GetChild(i).gameObject);
+            Undo.DestroyObjectImmediate(networkParent.GetChild(i).gameObject); //undo silme iþlemini hafýzaya almasý için
         }
 
         City[] allCities = FindObjectsByType<City>(FindObjectsSortMode.None);

@@ -53,8 +53,8 @@ public static class Dijkstra
     }
 
     public static List<CitySO> FindShortestPath(CitySO startCity, CitySO endCity) {
-        Dictionary<CitySO, float> distances = new Dictionary<CitySO, float>();
-        Dictionary<CitySO, CitySO> previousNodes = new Dictionary<CitySO, CitySO>();
+        Dictionary<CitySO, float> distances = new Dictionary<CitySO, float>(); //şehirlere olan şu ana kadar bulunmuş en kısa mesafeler
+        Dictionary<CitySO, CitySO> previousNodes = new Dictionary<CitySO, CitySO>(); //en kısa yolun rotasını tutmak için
         List<CitySO> unvisited = new List<CitySO>();
 
         // 1. Tüm şehirleri topla ve mesafeleri sonsuz yap
@@ -86,7 +86,7 @@ public static class Dijkstra
 
             // Komşuların mesafelerini güncelle
             foreach (CitySO neighbor in current.neighbors) {
-                if (!unvisited.Contains(neighbor)) continue;
+                if (!unvisited.Contains(neighbor)) continue; //current'in komşusu zaten ziyaret edilmişse
 
                 Road road = GraphManager.Instance.GetRoadBetween(current, neighbor);
                 if (road != null) {
@@ -97,6 +97,7 @@ public static class Dijkstra
                     }
                 }
             }
+
         }
 
         // 3. Rotayı Geriye Doğru Çiz
