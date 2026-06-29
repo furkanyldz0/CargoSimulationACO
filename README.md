@@ -90,4 +90,5 @@ The observer can change all cargo vehicle's behaviour with vehicle and ACO param
 
 ---
 The project was developed in Unity. The city, vehicle and tree models were made by me using Blender.
+<br>
 If you have any questions about the project, contact me via linkedin (furkanyldz0).
